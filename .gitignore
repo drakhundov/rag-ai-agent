@@ -1,0 +1,9 @@
+__pycache__
+.chainlit
+.files
+.env
+*.pdf
+*.txt
+TODO
+.idea
+.pytest_cache
