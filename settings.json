@@ -1,0 +1,6 @@
+{
+    "EMB_MODEL": "BAAI/bge-m3",
+    "CACHE_DIR": "${PROJ_DIR}/cache",
+    "CHROMA_INDEX_DIR": "${CACHE_DIR}/chroma_index",
+    "ROUTER_URL": "https://router.huggingface.co/v1"
+}
