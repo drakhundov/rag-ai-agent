@@ -6,34 +6,31 @@ from langchain_core.documents import Document
 from utils.vector import embed_texts, calc_pairwise_semantic_distances
 from utils.string import split_into_sentences, windowed_concat
 
+from config import load_conf
 
+
+# Interface: ports/TextSplitter
 class SemanticTextSplitter:
-    SENTENCE_CONCAT_BUFSZ = 2
-    BREAKPOINT_PERCENTILE_THRESHOLD = 95
-
     def __init__(
         self,
-        docs: List[Document],
         bufsz: int = None,
         breakpoint_percentile_threshold: int = None,
     ):
-        self.docs = docs
+        conf = load_conf()
         if bufsz is None:
-            bufsz = SemanticTextSplitter.SENTENCE_CONCAT_BUFSZ
+            bufsz = conf.concat_bufsz
         if breakpoint_percentile_threshold is None:
-            breakpoint_percentile_threshold = (
-                SemanticTextSplitter.BREAKPOINT_PERCENTILE_THRESHOLD
-            )
+            breakpoint_percentile_threshold = conf.breakpoint_percentile_threshold
         self.bufsz = bufsz
         self.breakpoint_percentile_threshold = breakpoint_percentile_threshold
 
-    def split(self) -> List[Document]:
+    def split(self, docs: List[Document]) -> List[Document]:
         """
         Chunk each Document into semantically-cohesive pieces using sentence-level
         embedding distances. Works with LangChain Documents.
         """
         all_chunks: List[Document] = []
-        for doc in self.docs:
+        for doc in docs:
             sentences = split_into_sentences(doc.page_content)
             if len(sentences) <= 1:
                 # Nothing to chunk; keep as-is.
