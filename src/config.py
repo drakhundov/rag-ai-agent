@@ -36,6 +36,8 @@ class Config:
     models: Models
     paths: Paths
     prompt_templ: Dict[str:List, str:str]
+    concat_bufsz: int
+    breakpoint_percentile_threshold: int
 
 
 # `lru_cache` caches function output values, so that
@@ -83,4 +85,6 @@ def load_conf() -> Config:
         models=models,
         paths=paths,
         prompt_templ=prompt_templ,
+        concat_bufsz=resolved["SENTENCE_CONCAT_BUFSZ"],
+        breakpoint_percentile_threshold=resolved["BREAKPOINT_PERCENTILE_THRESHOLD"]
     )
