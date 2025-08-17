@@ -25,6 +25,6 @@ def test_config_load(with_temp_conf):
     assert str(conf.paths.proj_dir) == PROJ_DIR
     assert isinstance(conf.paths.chroma_index_dir, Path)
     assert isinstance(conf.prompt_templ, dict)
-    assert conf.prompt_templ.get("INPUT_VARIABLES") is not None
-    assert conf.prompt_templ.get("TEXT") is not None
+    assert conf.prompt_templ.input_variables is not None
+    assert conf.prompt_templ.template is not None
     

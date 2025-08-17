@@ -10,6 +10,12 @@ from utils import replace_placeholders
 
 
 @dataclass(frozen=True)
+class PromptTempl:
+    input_variables: List[str]
+    template: str
+
+
+@dataclass(frozen=True)
 class Models:
     chat_model_name: str
     emb_model_name: str
@@ -33,7 +39,7 @@ class Config:
 
 
 # `lru_cache` caches function output values, so that
-# next time the function is called with the same 
+# next time the function is called with the same
 # arguments, the value is returned from cache.
 # `maxsize=1` tells to only store one args-return_val pair.
 @lru_cache(maxsize=1)
@@ -67,10 +73,14 @@ def load_conf() -> Config:
         chat_model_name=resolved["MODELS"]["DEFAULT_CHAT_MODEL"],
         emb_model_name=resolved["MODELS"]["DEFAULT_EMB_MODEL"],
     )
+    prompt_templ = PromptTempl(
+        input_variables=resolved["PROMPT_TEMPL"]["INPUT_VARIABLES"],
+        template=resolved["PROMPT_TEMPL"]["TEMPLATE"],
+    )
     return Config(
         openai_api_key=openai_api_key,
         hf_token=hf_token,
         models=models,
         paths=paths,
-        prompt_templ=resolved["PROMPT_TEMPL"],
+        prompt_templ=prompt_templ,
     )
