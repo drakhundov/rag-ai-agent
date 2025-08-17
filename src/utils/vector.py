@@ -12,7 +12,7 @@ def cosine_similarity(v1: np.ndarray, v2: np.ndarray) -> float:
     return float(np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2)))
 
 
-def pairwise_semantic_distances(embs: np.ndarray) -> List[float]:
+def calc_pairwise_semantic_distances(embs: np.ndarray) -> List[float]:
     """
     Given a list of embeddings, returns a list of
     corresponding pairwise distances. Calculates
