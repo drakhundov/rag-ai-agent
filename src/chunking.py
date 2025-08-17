@@ -27,7 +27,7 @@ class SemanticTextSplitter:
         self.bufsz = bufsz
         self.breakpoint_percentile_threshold = breakpoint_percentile_threshold
 
-    def perform_semantic_chunking(self) -> List[Document]:
+    def split(self) -> List[Document]:
         """
         Chunk each Document into semantically-cohesive pieces using sentence-level
         embedding distances. Works with LangChain Documents.
@@ -73,7 +73,6 @@ class SemanticTextSplitter:
 
         return all_chunks
 
-    # TODO: check this method for accuracy.
     @staticmethod
     def inherit_metadata(parent: Document, chunk_index: int) -> Dict:
         essential_metadata_keys = ("id", "source", "page", "doc_id")
