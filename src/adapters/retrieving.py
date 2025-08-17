@@ -22,7 +22,7 @@ class ChromaRetriever:
     ):
         self.conf = load_conf()
         if chroma_index_dir is None:
-            chroma_index_dir = conf.paths.chroma_index_dir
+            chroma_index_dir = self.conf.paths.chroma_index_dir
         self.persist_dir = chroma_index_dir
         self.emb_model = emb_model
         self.text_splitter = text_splitter

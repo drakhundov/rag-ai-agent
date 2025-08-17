@@ -6,7 +6,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List
 
-from utils import replace_placeholders
+from utils.string import replace_placeholders
 
 
 @dataclass(frozen=True)

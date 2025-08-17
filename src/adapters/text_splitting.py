@@ -16,11 +16,11 @@ class SemanticTextSplitter:
         bufsz: int = None,
         breakpoint_percentile_threshold: int = None,
     ):
-        conf = load_conf()
+        self.conf = load_conf()
         if bufsz is None:
-            bufsz = conf.concat_bufsz
+            bufsz = self.conf.concat_bufsz
         if breakpoint_percentile_threshold is None:
-            breakpoint_percentile_threshold = conf.breakpoint_percentile_threshold
+            breakpoint_percentile_threshold = self.conf.breakpoint_percentile_threshold
         self.bufsz = bufsz
         self.breakpoint_percentile_threshold = breakpoint_percentile_threshold
 
