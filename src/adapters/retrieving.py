@@ -34,18 +34,17 @@ class ChromaRetriever:
         if self.vs is not None:
             return
         if not os.path.exists(self.persist_dir):
-            # первичная индексация
             docs: list[Document] = []
             for path in self.pdf_paths:
-                docs += PyPDFLoader(path).load()
+                docs.extend(PyPDFLoader(path).load())
             chunks = self.text_splitter.split(docs)
             self.vs = Chroma.from_documents(
-                chunks, self.emb_model, persist_directory=self._persist_dir
+                chunks, self.emb_model, persist_directory=self.persist_dir
             )
         else:
             self._vs = Chroma(
-                persist_directory=self._persist_dir,
-                embedding_function=self._embedding_fn,
+                persist_directory=self.persist_dir,
+                embedding_function=self.emb_model,
             )
 
     def retrieve(self, query: str, k: int = 4) -> list[Document]:
