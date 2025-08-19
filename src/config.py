@@ -60,11 +60,11 @@ def load_conf() -> Config:
     if not os.path.exists(proj_dir / "settings.json"):
         raise FileNotFoundError(f"File `{proj_dir / 'settings.json'}` does not exist.")
     with open(proj_dir / "settings.json") as fp:
-        settings = json.load(fp)
-    resolved = {
-        k: replace_placeholders(v, settings) if isinstance(v, str) else v
-        for k, v in settings.items()
-    }
+        settings = {**json.load(fp), **{"PROJ_DIR": proj_dir}}
+    resolved = dict(settings)
+    for k, v in resolved.items():
+        if isinstance(v, str):
+            resolved[k] = replace_placeholders(v, resolved)
     paths = Paths(
         proj_dir=proj_dir,
         cache_dir=Path(resolved["CACHE_DIR"]).resolve(),
@@ -86,5 +86,5 @@ def load_conf() -> Config:
         paths=paths,
         prompt_templ=prompt_templ,
         concat_bufsz=resolved["SENTENCE_CONCAT_BUFSZ"],
-        breakpoint_percentile_threshold=resolved["BREAKPOINT_PERCENTILE_THRESHOLD"]
+        breakpoint_percentile_threshold=resolved["BREAKPOINT_PERCENTILE_THRESHOLD"],
     )
