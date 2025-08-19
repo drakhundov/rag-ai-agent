@@ -7,3 +7,4 @@ __pycache__
 TODO
 .idea
 .pytest_cache
+.DS_Store
