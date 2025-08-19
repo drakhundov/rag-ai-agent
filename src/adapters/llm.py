@@ -15,7 +15,11 @@ class ChatOpenAILLMService:
             model_name = self.conf.models.chat_model_name
         if api_key is None:
             api_key = self.conf.openai_api_key
-        self._llm_model = ChatOpenAI(model=model_name, api_key=api_key)
+        self._llm_model = ChatOpenAI(
+            model=model_name,
+            base_url=self.conf.paths.router_url,
+            api_key=api_key
+        )
 
     def generate(
         self, prompt_templ: PromptTemplate, question: str, context: List[Document]
