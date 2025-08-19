@@ -39,17 +39,17 @@ class ChromaRetriever:
                 docs.extend(PyPDFLoader(path).load())
             chunks = self.text_splitter.split(docs)
             self.vs = Chroma.from_documents(
-                chunks, self.emb_model, persist_directory=self.persist_dir
+                chunks, self.emb_model, persist_directory=str(self.persist_dir)
             )
         else:
-            self._vs = Chroma(
-                persist_directory=self.persist_dir,
+            self.vs = Chroma(
+                persist_directory=str(self.persist_dir),
                 embedding_function=self.emb_model,
             )
 
     def retrieve(self, query: str, k: int = 4) -> list[Document]:
         self._ensure_index()
-        return self._vs.as_retriever(search_kwargs={"k": k}).invoke(query)
+        return self.vs.as_retriever(search_kwargs={"k": k}).invoke(query)
 
     # TODO: implement a method for adding new documents to the db.
     def add_doc(self, doc: Document): ...
