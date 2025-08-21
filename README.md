@@ -1,6 +1,6 @@
-# PDF RAG AI Agent
+# RAG AI Agent
 
-This project utilizes Retrieval-Augmented Generation (RAG) to enable large language models (LLMs) to interact effectively with PDF documents. It includes OCR support to process scanned or corrupted PDFs.
+This project utilizes Retrieval-Augmented Generation (RAG) to enable large language models (LLMs) to interact effectively with documents (PDF documents for now). It includes OCR support to process scanned or corrupted PDFs.
 
 # Features
 
@@ -17,6 +17,11 @@ Python 3.9+
 pip install -r requirements.txt
 ```
 *Installs all required dependencies.*
+
+You need *tesseract* to use OCR.
+```bash
+brew install tesseract
+```
 
 # Usage
 
