@@ -6,12 +6,22 @@
     "CACHE_DIR": "${PROJ_DIR}/cache",
     "CHROMA_INDEX_DIR": "${CACHE_DIR}/chroma_index",
     "ROUTER_URL": "https://router.huggingface.co/v1",
-    "PROMPT_TEMPL": {
-        "INPUT_VARIABLES": [
-            "context",
-            "question"
-        ],
-        "TEMPLATE": "You are a careful, literal customer assistant. Answer strictly and only from the provided context. If the answer is not fully supported by the context, say: \"I don't know based on the provided document.\" Be concise and factual.\n\n# Context:\n{context}\n\n# Question:\n{question}\n\n# Rules:\n1) Do not use outside knowledge.\n2) If multiple pages disagree, state what each one claims.\n3) If the context is insufficient, say you don't know.\n4) Whenever possible, quote numbers/names exactly as they appear.\n5) Provide page references if possible (p.X).\n\nAnswer:"
+    "LANGSMITH_API_URL": "https://api.smith.langchain.com",
+    "PROMPT_TEMPLATES": {
+        "SYSTEM": {
+            "INPUT_VARIABLES": [
+                "context",
+                "question"
+            ],
+            "TEMPLATE": "You are a careful, literal customer assistant. Answer strictly and only from the provided context. If the answer is not fully supported by the context, say: \"I don't know based on the provided document.\" Be concise and factual.\n\n# Context:\n{context}\n\n# Question:\n{question}\n\n# Rules:\n1) Do not use outside knowledge.\n2) If multiple pages disagree, state what each one claims.\n3) If the context is insufficient, say you don't know.\n4) Whenever possible, quote numbers/names exactly as they appear.\n5) Provide page references if possible (p.X).\n\nAnswer:"
+        },
+        "MULTI_QUERY_RAG_PROMPT": {
+            "INPUT_VARIABLES": [
+                "question",
+                "quantity"
+            ],
+            "TEMPLATE": "You are an AI language model assistant. Your task is to generate {quantity} different versions of the given user question to retrieve relevant documents from a vector database. By generating multiple perspectives on the user question, your goal is to help the user overcome some of the limitations of the distance-based similarity search. Provide these alternative questions separated by newlines. Original question: {question}"
+        }
     },
     "SENTENCE_CONCAT_BUFSZ": 2,
     "BREAKPOINT_PERCENTILE_THRESHOLD": 95
