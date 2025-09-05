@@ -8,6 +8,7 @@ from config import load_conf
 from adapters import ChatOpenAILLMService, ChromaRetriever, SemanticTextSplitter
 from services.retriever_service import RetrieverService
 
+
 # Ensure imports could omit "src".
 # sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
