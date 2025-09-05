@@ -6,6 +6,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import List
 
+from pydantic import SecretStr
+
 from utils.string import replace_placeholders
 
 
@@ -38,9 +40,9 @@ class Paths:
 
 @dataclass(frozen=True)
 class Config:
-    openai_api_key: str
-    hf_token: str
-    langchain_api_key: str
+    openai_api_key: SecretStr
+    hf_token: SecretStr
+    langchain_api_key: SecretStr
     models: Models
     paths: Paths
     prompt_templs: PromptTempls
@@ -90,18 +92,18 @@ def load_conf() -> Config:
     )
     prompt_templs = PromptTempls(
         system=PromptTempl(
-            input_variables=resolved["PROMPT_TEMPL"]["INPUT_VARIABLES"],
-            template=resolved["PROMPT_TEMPL"]["TEMPLATE"],
+            input_variables=resolved["PROMPT_TEMPLATES"]["SYSTEM"]["INPUT_VARIABLES"],
+            template=resolved["PROMPT_TEMPLATES"]["SYSTEM"]["TEMPLATE"],
         ),
         multi_query_rag_prompt=PromptTempl(
-            input_variables=resolved["MULTI_QUERY_RAG_PROMPT"]["INPUT_VARIABLES"],
-            template=resolved["MULTI_QUERY_RAG_PROMPT"]["TEMPLATE"],
+            input_variables=resolved["PROMPT_TEMPLATES"]["MULTI_QUERY_RAG_PROMPT"]["INPUT_VARIABLES"],
+            template=resolved["PROMPT_TEMPLATES"]["MULTI_QUERY_RAG_PROMPT"]["TEMPLATE"],
         )
     )
     return Config(
-        openai_api_key=openai_api_key,
-        hf_token=hf_token,
-        langchain_api_key=langchain_api_key,
+        openai_api_key=SecretStr(openai_api_key),
+        hf_token=SecretStr(hf_token),
+        langchain_api_key=SecretStr(langchain_api_key),
         models=models,
         paths=paths,
         prompt_templs=prompt_templs,
