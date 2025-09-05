@@ -21,6 +21,9 @@ class ChatOpenAILLMService:
             api_key=api_key
         )
 
+    def as_langchain(self) -> ChatOpenAI:
+        return self._llm_model
+
     def generate(
         self, prompt_templ: PromptTemplate, question: str, context: List[Document]
     ) -> str:

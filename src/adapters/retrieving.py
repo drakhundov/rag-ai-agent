@@ -5,9 +5,11 @@ from langchain_community.vectorstores import Chroma
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
+from langchain_core.vectorstores import VectorStoreRetriever
 
 from ports import TextSplitter
 from config import load_conf
+
 
 # TODO: cache which documents have been indexed etc.
 
@@ -51,5 +53,10 @@ class ChromaRetriever:
         self._ensure_index()
         return self.vs.as_retriever(search_kwargs={"k": k}).invoke(query)
 
+    def as_langchain(self) -> VectorStoreRetriever:
+        self._ensure_index()
+        return self.vs.as_retriever()
+
     # TODO: implement a method for adding new documents to the db.
-    def add_doc(self, doc: Document): ...
+    def add_doc(self, doc: Document):
+        ...
