@@ -1,36 +1,41 @@
 """This module deals with .env (API TOKENS) and configuration (models, paths)."""
 
-import os, dotenv, json
+import dotenv
+import json
+import os
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import List
+from typing import List, NewType
 
 from pydantic import SecretStr
 
 from utils.string import replace_placeholders
 
+# Types.
+QueryStr = NewType("QueryStr", str)
+
 
 @dataclass(frozen=True)
-class PromptTempl:
+class _PromptTempl:
     input_variables: List[str]
     template: str
 
 
 @dataclass(frozen=True)
-class PromptTempls:
-    system: PromptTempl
-    multi_query_rag_prompt: PromptTempl
+class _PromptTempls:
+    system: _PromptTempl
+    multi_query_rag_prompt: _PromptTempl
 
 
 @dataclass(frozen=True)
-class Models:
+class _Models:
     chat_model_name: str
     emb_model_name: str
 
 
 @dataclass(frozen=True)
-class Paths:
+class _Paths:
     proj_dir: Path
     cache_dir: Path
     chroma_index_dir: Path
@@ -39,13 +44,13 @@ class Paths:
 
 
 @dataclass(frozen=True)
-class Config:
+class _Config:
     openai_api_key: SecretStr
     hf_token: SecretStr
     langchain_api_key: SecretStr
-    models: Models
-    paths: Paths
-    prompt_templs: PromptTempls
+    models: _Models
+    paths: _Paths
+    prompt_templs: _PromptTempls
     concat_bufsz: int
     breakpoint_percentile_threshold: int
 
@@ -55,7 +60,7 @@ class Config:
 # arguments, the value is returned from cache.
 # `maxsize=1` tells to only store one args-return_val pair.
 @lru_cache(maxsize=1)
-def load_conf() -> Config:
+def load_conf() -> _Config:
     # This file's path: PROJ_DIR/src/config.py
     # Thus, we need the second parent.
     proj_dir = Path(__file__).resolve().parents[1]
@@ -79,28 +84,28 @@ def load_conf() -> Config:
     for k, v in resolved.items():
         if isinstance(v, str):
             resolved[k] = replace_placeholders(v, resolved)
-    paths = Paths(
+    paths = _Paths(
         proj_dir=proj_dir,
         cache_dir=Path(resolved["CACHE_DIR"]).resolve(),
         chroma_index_dir=Path(resolved["CHROMA_INDEX_DIR"]).resolve(),
         router_url=resolved["ROUTER_URL"],
         langsmith_api_url=resolved["LANGSMITH_API_URL"]
     )
-    models = Models(
+    models = _Models(
         chat_model_name=resolved["MODELS"]["DEFAULT_CHAT_MODEL"],
         emb_model_name=resolved["MODELS"]["DEFAULT_EMB_MODEL"]
     )
-    prompt_templs = PromptTempls(
-        system=PromptTempl(
+    prompt_templs = _PromptTempls(
+        system=_PromptTempl(
             input_variables=resolved["PROMPT_TEMPLATES"]["SYSTEM"]["INPUT_VARIABLES"],
             template=resolved["PROMPT_TEMPLATES"]["SYSTEM"]["TEMPLATE"],
         ),
-        multi_query_rag_prompt=PromptTempl(
+        multi_query_rag_prompt=_PromptTempl(
             input_variables=resolved["PROMPT_TEMPLATES"]["MULTI_QUERY_RAG_PROMPT"]["INPUT_VARIABLES"],
             template=resolved["PROMPT_TEMPLATES"]["MULTI_QUERY_RAG_PROMPT"]["TEMPLATE"],
         )
     )
-    return Config(
+    return _Config(
         openai_api_key=SecretStr(openai_api_key),
         hf_token=SecretStr(hf_token),
         langchain_api_key=SecretStr(langchain_api_key),
@@ -110,3 +115,6 @@ def load_conf() -> Config:
         concat_bufsz=resolved["SENTENCE_CONCAT_BUFSZ"],
         breakpoint_percentile_threshold=resolved["BREAKPOINT_PERCENTILE_THRESHOLD"]
     )
+
+
+__all__ = ["load_conf", "QueryStr"]
