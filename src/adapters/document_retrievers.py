@@ -13,8 +13,8 @@ from config import load_conf
 
 # TODO: cache which documents have been indexed etc.
 
-# Interface: ports/Retriever
-class ChromaRetriever:
+# Interface: ports/DocumentRetriever
+class ChromaDocumentRetriever:
     def __init__(
         self,
         pdf_paths: List[str],
@@ -53,7 +53,7 @@ class ChromaRetriever:
         self._ensure_index()
         return self.vs.as_retriever(search_kwargs={"k": k}).invoke(query)
 
-    def as_langchain(self) -> VectorStoreRetriever:
+    def __call__(self) -> VectorStoreRetriever:
         self._ensure_index()
         return self.vs.as_retriever()
 

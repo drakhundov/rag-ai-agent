@@ -7,8 +7,8 @@ from langchain.prompts import PromptTemplate
 from config import load_conf
 
 
-# Interface: ports/LLMService
-class ChatOpenAILLMService:
+# Interface: ports/ChatModel
+class OpenAIChatModel:
     def __init__(self, model_name: str = None, api_key: str = None):
         self.conf = load_conf()
         if model_name is None:
@@ -21,7 +21,7 @@ class ChatOpenAILLMService:
             api_key=api_key
         )
 
-    def as_langchain(self) -> ChatOpenAI:
+    def __call__(self) -> ChatOpenAI:
         return self._llm_model
 
     def generate(

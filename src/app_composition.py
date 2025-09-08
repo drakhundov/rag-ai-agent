@@ -5,14 +5,14 @@ from langchain.prompts import PromptTemplate
 
 from config import load_conf
 
-from adapters import ChatOpenAILLMService, ChromaRetriever, SemanticTextSplitter
-from services.retriever_service import RetrieverService
+from adapters import OpenAIChatModel, ChromaDocumentRetriever, SemanticTextSplitter
+from services.rag_engine import RAGEngine
 
 
 # Ensure imports could omit "src".
 # sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-def build_app() -> RetrieverService:
+def build_app() -> RAGEngine:
     conf = load_conf()
     # Set up LangSmith.
     os.environ["LANGCHAIN_TRACING_V2"] = "true"
@@ -21,17 +21,17 @@ def build_app() -> RetrieverService:
     os.environ["LANGSMITH_ENDPOINT"] = conf.paths.langsmith_api_url
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-    retriever = ChromaRetriever(
+    retriever = ChromaDocumentRetriever(
         pdf_paths=["context.pdf"],
         emb_model=HuggingFaceEmbeddings(model_name=conf.models.emb_model_name),
         text_splitter=SemanticTextSplitter(),  # Use default config.
         # Use default chroma index directory.
     )
-    llm_model = ChatOpenAILLMService()  # Use default config.
+    llm_service = OpenAIChatModel()  # Use default config.
     sys_prompt_template = PromptTemplate(
         input_variables=conf.prompt_templs.system.input_variables,
         template=conf.prompt_templs.system.template,
     )
-    return RetrieverService(
-        retriever=retriever, llm_model=llm_model, sys_prompt_template=sys_prompt_template
+    return RAGEngine(
+        retriever=retriever, llm_service=llm_service, sys_prompt_template=sys_prompt_template
     )
