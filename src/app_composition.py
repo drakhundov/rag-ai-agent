@@ -21,17 +21,18 @@ def build_app() -> RAGEngine:
     os.environ["LANGSMITH_ENDPOINT"] = conf.paths.langsmith_api_url
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-    retriever = ChromaDocumentRetriever(
+    doc_retriever = ChromaDocumentRetriever(
         pdf_paths=["context.pdf"],
         emb_model=HuggingFaceEmbeddings(model_name=conf.models.emb_model_name),
-        text_splitter=SemanticTextSplitter(),  # Use default config.
+        text_splitter=SemanticTextSplitter()
+        # Use default config.
         # Use default chroma index directory.
     )
-    llm_service = OpenAIChatModel()  # Use default config.
+    chat_model = OpenAIChatModel()  # Use default config.
     sys_prompt_template = PromptTemplate(
         input_variables=conf.prompt_templs.system.input_variables,
-        template=conf.prompt_templs.system.template,
+        template=conf.prompt_templs.system.template
     )
     return RAGEngine(
-        retriever=retriever, llm_service=llm_service, sys_prompt_template=sys_prompt_template
+        doc_retriever=doc_retriever, chat_model=chat_model, sys_prompt_template=sys_prompt_template
     )
