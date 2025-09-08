@@ -57,6 +57,6 @@ class ChromaDocumentRetriever:
         self._ensure_index()
         return self.vs.as_retriever()
 
-    # TODO: implement a method for adding new documents to the db.
-    def add_doc(self, doc: Document):
-        ...
+    def add_docs(self, docs: List[Document]):
+        self.vs.add_documents(docs)
+        self.vs.persist()  # Write changes to disk.
