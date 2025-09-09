@@ -1,8 +1,8 @@
 import os
 from typing import List
 
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
-from langchain_community.document_loaders import PyPDFLoader
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 from langchain_core.vectorstores import VectorStoreRetriever
@@ -17,44 +17,43 @@ from config import load_conf
 class ChromaDocumentRetriever:
     def __init__(
         self,
-        pdf_paths: List[str],
-        emb_model: Embeddings,
+        docs: List[Document],
         text_splitter: TextSplitter,
         chroma_index_dir: str = None,
+        emb_model: Embeddings = None
     ):
-        self.conf = load_conf()
-        if chroma_index_dir is None:
-            chroma_index_dir = self.conf.paths.chroma_index_dir
+        with load_conf() as conf:
+            if chroma_index_dir is None:
+                chroma_index_dir = conf.paths.chroma_index_dir
+            if emb_model is None:
+                emb_model = HuggingFaceEmbeddings(model_name=conf.models.emb_model_name)
         self.persist_dir = chroma_index_dir
         self.emb_model = emb_model
         self.text_splitter = text_splitter
-        self.pdf_paths = pdf_paths
+        self.docs = docs
         self.vs = None
+        self._initialize_index()
 
-    def _ensure_index(self):
+    def _initialize_index(self):
         """Initialize the vectorstore if hasn't been initialized yet."""
         if self.vs is not None:
             return
+        chunks = self.text_splitter.split(self.docs)
         if not os.path.exists(self.persist_dir):
-            docs: list[Document] = []
-            for path in self.pdf_paths:
-                docs.extend(PyPDFLoader(path).load())
-            chunks = self.text_splitter.split(docs)
             self.vs = Chroma.from_documents(
-                chunks, self.emb_model, persist_directory=str(self.persist_dir)
+                chunks, self.emb_model, persist_directory=self.persist_dir
             )
         else:
             self.vs = Chroma(
-                persist_directory=str(self.persist_dir),
+                persist_directory=self.persist_dir,
                 embedding_function=self.emb_model,
             )
+        self.add_docs(chunks)
 
     def retrieve(self, query: str, k: int = 4) -> list[Document]:
-        self._ensure_index()
         return self.vs.as_retriever(search_kwargs={"k": k}).invoke(query)
 
     def __call__(self) -> VectorStoreRetriever:
-        self._ensure_index()
         return self.vs.as_retriever()
 
     def add_docs(self, docs: List[Document]):

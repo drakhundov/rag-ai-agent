@@ -1,6 +1,6 @@
 import os
 
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.document_loaders import PyPDFLoader
 from langchain.prompts import PromptTemplate
 
 from config import load_conf
@@ -21,9 +21,9 @@ def build_app() -> RAGEngine:
     os.environ["LANGSMITH_ENDPOINT"] = conf.paths.langsmith_api_url
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
+    docs = PyPDFLoader("context.pdf").load()
     doc_retriever = ChromaDocumentRetriever(
-        pdf_paths=["context.pdf"],
-        emb_model=HuggingFaceEmbeddings(model_name=conf.models.emb_model_name),
+        docs=docs,
         text_splitter=SemanticTextSplitter()
         # Use default config.
         # Use default chroma index directory.
