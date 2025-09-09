@@ -54,6 +54,12 @@ class _Config:
     concat_bufsz: int
     breakpoint_percentile_threshold: int
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
 
 # `lru_cache` caches function output values, so that
 # next time the function is called with the same
