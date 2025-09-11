@@ -1,8 +1,8 @@
 from typing import List
 
-from langchain_openai import ChatOpenAI
-from langchain_core.documents import Document
 from langchain.prompts import PromptTemplate
+from langchain_core.documents import Document
+from langchain_openai import ChatOpenAI
 
 from config import load_conf
 

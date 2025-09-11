@@ -1,10 +1,11 @@
-import chainlit as cl
 import anyio
+import chainlit as cl
 
 from app_composition import build_app
 from services.rag_engine import RAGEngine
 
 svc: RAGEngine = build_app()
+
 
 @cl.on_message
 async def on_message(msg: str | cl.Message):

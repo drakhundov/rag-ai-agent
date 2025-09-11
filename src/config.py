@@ -1,6 +1,5 @@
 """This module deals with .env (API TOKENS) and configuration (models, paths)."""
 
-import dotenv
 import json
 import os
 from dataclasses import dataclass
@@ -8,9 +7,10 @@ from functools import lru_cache
 from pathlib import Path
 from typing import List, NewType
 
+import dotenv
 from pydantic import SecretStr
 
-from utils.string import replace_placeholders
+from utilities.string import replace_placeholders
 
 # Types.
 QueryStr = NewType("QueryStr", str)

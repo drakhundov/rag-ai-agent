@@ -3,10 +3,9 @@ from typing import List, Dict
 import numpy as np
 from langchain_core.documents import Document
 
-from utils.vector import embed_texts, calc_pairwise_semantic_distances
-from utils.string import split_into_sentences, windowed_concat
-
 from config import load_conf
+from utilities.string import split_into_sentences, windowed_concat
+from utilities.vector import embed_texts, calc_pairwise_semantic_distances
 
 
 # Interface: ports/TextSplitter

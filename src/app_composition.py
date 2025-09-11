@@ -1,11 +1,10 @@
 import os
 
-from langchain_community.document_loaders import PyPDFLoader
 from langchain.prompts import PromptTemplate
-
-from config import load_conf
+from langchain_community.document_loaders import PyPDFLoader
 
 from adapters import OpenAIChatModel, ChromaDocumentRetriever, SemanticTextSplitter
+from config import load_conf
 from services.rag_engine import RAGEngine
 
 
