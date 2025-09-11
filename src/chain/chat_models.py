@@ -4,7 +4,7 @@ from langchain.prompts import PromptTemplate
 from langchain_core.documents import Document
 from langchain_openai import ChatOpenAI
 
-from config import load_conf
+from core.config import load_conf
 
 
 # Interface: ports/ChatModel

@@ -7,8 +7,8 @@ from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 from langchain_core.vectorstores import VectorStoreRetriever
 
-from config import load_conf
-from ports import TextSplitter
+from core.config import load_conf
+from core.protocols import TextSplitter
 
 
 # TODO: cache which documents have been indexed etc.

@@ -4,8 +4,8 @@ from langchain.prompts import PromptTemplate
 from langchain_core.documents import Document
 from langchain_core.output_parsers import StrOutputParser
 
-from config import load_conf, QueryStr
-from ports import DocumentRetriever, ChatModel
+from core.config import load_conf, QueryStr
+from core.protocols import DocumentRetriever, ChatModel
 
 
 # TODO: incorporate different query translation strategies.

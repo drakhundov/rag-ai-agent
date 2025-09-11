@@ -5,15 +5,12 @@ import os
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import List, NewType
+from typing import List
 
 import dotenv
 from pydantic import SecretStr
 
 from utilities.string import replace_placeholders
-
-# Types.
-QueryStr = NewType("QueryStr", str)
 
 
 @dataclass(frozen=True)
@@ -123,4 +120,4 @@ def load_conf() -> _Config:
     )
 
 
-__all__ = ["load_conf", "QueryStr"]
+__all__ = ["load_conf"]

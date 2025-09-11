@@ -3,7 +3,7 @@ from typing import List
 import numpy as np
 from langchain_huggingface import HuggingFaceEmbeddings
 
-from config import load_conf
+from core.config import load_conf
 
 conf = load_conf()
 

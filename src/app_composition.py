@@ -3,8 +3,8 @@ import os
 from langchain.prompts import PromptTemplate
 from langchain_community.document_loaders import PyPDFLoader
 
-from adapters import OpenAIChatModel, ChromaDocumentRetriever, SemanticTextSplitter
-from config import load_conf
+from chain import OpenAIChatModel, ChromaDocumentRetriever, SemanticTextSplitter
+from core.config import load_conf
 from services.rag_engine import RAGEngine
 
 
