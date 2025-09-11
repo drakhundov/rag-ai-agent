@@ -1,5 +1,5 @@
-from typing import List
 from json import dumps, loads
+from typing import List
 
 from langchain_core.documents import Document
 

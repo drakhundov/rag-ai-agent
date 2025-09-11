@@ -1,13 +1,13 @@
 # ! requires pymupdf pillow pytesseract pypdf
-from PIL import Image
 from io import BytesIO
 
 import fitz
 import pytesseract
+from PIL import Image
 from pypdf import PdfReader, PdfWriter
 
 
-#! Writes to the directory instead of returning binary.
+# ! Writes to the directory instead of returning binary.
 def perform_ocr_on_pdf(
     src_path: str, dest_path: str, dpi: int = 300, lang: str = "tur+eng"
 ) -> None:
