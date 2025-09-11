@@ -3,7 +3,8 @@ Provides a common interface for Chainlit, so the background processes could be
 modified, different techniques could be used without the need to refactor.
 """
 
-from typing import Protocol, List
+from typing import Protocol, Optional, List, Dict
+
 from langchain.prompts import PromptTemplate
 from langchain_core.documents import Document
 from langchain_core.language_models import BaseChatModel
@@ -31,4 +32,15 @@ class ChatModel(Protocol):
 
 
 class TextSplitter(Protocol):
-    def split(self, docs: List[Document]) -> List[Document]: ...
+    def split(self, docs: List[Document]) -> List[Document]:
+        ...
+
+
+class QueryTranslator(Protocol):
+    def translate(self, query: str, ctx: Optional[Dict]) -> List[str]:
+        ...
+
+
+class TranslatorRouter(Protocol):
+    def route(self, query: str, ctx: Optional[Dict]) -> List[QueryTranslator]:
+        ...
