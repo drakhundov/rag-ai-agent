@@ -21,11 +21,11 @@ class OpenAIChatModel:
             api_key=api_key
         )
 
-    def __call__(self) -> ChatOpenAI:
-        return self._llm_model
-
     def generate(
-        self, prompt_templ: PromptTemplate, question: str, context: List[Document]
+        self, prompt_templ: PromptTemplate, query: str, context: List[Document]
     ) -> str:
         chain = prompt_templ | self._llm_model
-        return chain.invoke({"question": question, "context": context}).content
+        return chain.invoke({"question": query, "context": context}).content
+
+    def __ror__(self, other):
+        return other | self._llm_model

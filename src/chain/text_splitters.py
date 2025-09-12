@@ -3,7 +3,7 @@ from typing import List, Dict
 import numpy as np
 from langchain_core.documents import Document
 
-from config import load_conf
+from core.config import load_conf
 from utilities.string import split_into_sentences, windowed_concat
 from utilities.vector import embed_texts, calc_pairwise_semantic_distances
 

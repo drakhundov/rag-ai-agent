@@ -11,16 +11,36 @@
         "SYSTEM": {
             "INPUT_VARIABLES": [
                 "context",
-                "question"
+                "query"
             ],
-            "TEMPLATE": "You are a careful, literal customer assistant. Answer strictly and only from the provided context. If the answer is not fully supported by the context, say: \"I don't know based on the provided document.\" Be concise and factual.\n\n# Context:\n{context}\n\n# Question:\n{question}\n\n# Rules:\n1) Do not use outside knowledge.\n2) If multiple pages disagree, state what each one claims.\n3) If the context is insufficient, say you don't know.\n4) Whenever possible, quote numbers/names exactly as they appear.\n5) Provide page references if possible (p.X).\n\nAnswer:"
+            "TEMPLATE": "You are a careful, literal customer assistant. Answer strictly and only from the provided context. If the answer is not fully supported by the context, say: \"I don't know based on the provided document.\" Be concise and factual.\n\nContext:\n{context}\n\nQuestion:\n{query}\n\nRules:\n1) Do not use outside knowledge.\n2) If multiple pages disagree, state what each one claims.\n3) If the context is insufficient, say so.\n4) Whenever possible, quote numbers/names exactly as they appear.\n5) Provide page references if possible (p.X).\n\nAnswer:"
         },
         "MULTI_QUERY_RAG_PROMPT": {
             "INPUT_VARIABLES": [
-                "question",
+                "query",
                 "quantity"
             ],
-            "TEMPLATE": "You are an AI language model assistant. Your task is to generate {quantity} different versions of the given user question to retrieve relevant documents from a vector database. By generating multiple perspectives on the user question, your goal is to help the user overcome some of the limitations of the distance-based similarity search. Provide these alternative questions separated by newlines. Original question: {question}"
+            "TEMPLATE": "You are an AI language model assistant. Your task is to generate {quantity} different versions of the given user query to retrieve relevant documents from a vector database. By generating multiple perspectives on the user query, your goal is to help the user overcome some of the limitations of the distance-based similarity search. Provide these alternative querys separated by newlines. Original query: {query}"
+        },
+        "HYDE_RAG_PROMPT": {
+            "INPUT_VARIABLES": [
+                "query"
+            ],
+            "TEMPLATE": "Generate a scientific paper passage to answer the query.\nQuestion: {query}\n\nPassage:"
+        },
+        "DECOMPOSITION_RAG_PROMPT": {
+            "INPUT_VARIABLES": [
+                "query",
+                "quantity"
+            ],
+            "TEMPLATE": "Decompose the following question into {quantity} simpler sub-questions that can each be answered with a short passage from a document:\nQuestion: {question}\nSub-questions:"
+        },
+        "STEP_UP_RAG_PROMPT": {
+            "INPUT_VARIABLES": [
+                "query",
+                "quantity"
+            ],
+            "TEMPLATE": "Generalize the following question into {quantity} more abstract questions that can each be answered with a short passage from a document:\nQuestion: {question}\nAbstract questions:"
         }
     },
     "SENTENCE_CONCAT_BUFSZ": 2,

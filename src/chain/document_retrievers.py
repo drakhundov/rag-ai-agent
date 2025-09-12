@@ -8,7 +8,7 @@ from langchain_core.embeddings import Embeddings
 from langchain_core.vectorstores import VectorStoreRetriever
 
 from core.config import load_conf
-from core.protocols import TextSplitter
+from core.ports import TextSplitter
 
 
 # TODO: cache which documents have been indexed etc.
@@ -53,9 +53,9 @@ class ChromaDocumentRetriever:
     def retrieve(self, query: str, k: int = 4) -> list[Document]:
         return self.vs.as_retriever(search_kwargs={"k": k}).invoke(query)
 
-    def __call__(self) -> VectorStoreRetriever:
-        return self.vs.as_retriever()
-
     def add_docs(self, docs: List[Document]):
         self.vs.add_documents(docs)
         self.vs.persist()  # Write changes to disk.
+
+    def __ror__(self, other):
+        return other | self.vs.as_retriever()

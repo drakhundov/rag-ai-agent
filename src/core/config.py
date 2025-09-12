@@ -23,6 +23,9 @@ class _PromptTempl:
 class _PromptTempls:
     system: _PromptTempl
     multi_query_rag_prompt: _PromptTempl
+    hyde_rag_prompt: _PromptTempl
+    decomposition_rag_prompt: _PromptTempl
+    step_up_rag_prompt: _PromptTempl
 
 
 @dataclass(frozen=True)
@@ -106,6 +109,18 @@ def load_conf() -> _Config:
         multi_query_rag_prompt=_PromptTempl(
             input_variables=resolved["PROMPT_TEMPLATES"]["MULTI_QUERY_RAG_PROMPT"]["INPUT_VARIABLES"],
             template=resolved["PROMPT_TEMPLATES"]["MULTI_QUERY_RAG_PROMPT"]["TEMPLATE"],
+        ),
+        hyde_rag_prompt=_PromptTempl(
+            input_variables=resolved["PROMPT_TEMPLATES"]["HYDE_RAG_PROMPT"]["INPUT_VARIABLES"],
+            template=resolved["PROMPT_TEMPLATES"]["HYDE_RAG_PROMPT"]["TEMPLATE"],
+        ),
+        decomposition_rag_prompt=_PromptTempl(
+            input_variables=resolved["PROMPT_TEMPLATES"]["DECOMPOSITION_RAG_PROMPT"]["INPUT_VARIABLES"],
+            template=resolved["PROMPT_TEMPLATES"]["DECOMPOSITION_RAG_PROMPT"]["TEMPLATE"],
+        ),
+        step_up_rag_prompt=_PromptTempl(
+            input_variables=resolved["PROMPT_TEMPLATES"]["STEP_UP_RAG_PROMPT"]["INPUT_VARIABLES"],
+            template=resolved["PROMPT_TEMPLATES"]["STEP_UP_RAG_PROMPT"]["TEMPLATE"],
         )
     )
     return _Config(
