@@ -5,7 +5,7 @@ import os
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import dotenv
 from pydantic import SecretStr
@@ -39,7 +39,7 @@ class _Paths:
     proj_dir: Path
     cache_dir: Path
     chroma_index_dir: Path
-    router_url: str
+    hf_router_url: str
     langsmith_api_url: str
 
 
@@ -67,9 +67,13 @@ class _Config:
 # `maxsize=1` tells to only store one args-return_val pair.
 @lru_cache(maxsize=1)
 def load_conf() -> _Config:
-    # This file's path: PROJ_DIR/src/config.py
-    # Thus, we need the second parent.
-    proj_dir = Path(__file__).resolve().parents[1]
+    # The env variable is set in the testing environment.
+    if (proj_dir_path := os.getenv("PROJ_DIR")) is not None:
+        proj_dir = Path(proj_dir_path).resolve()
+    else:
+        # This file's path: PROJ_DIR/src/config.py
+        # Thus, we need the second parent.
+        proj_dir = Path(__file__).resolve().parents[1]
     # Load variables from the '.env' file.
     if not os.path.exists(proj_dir / ".env"):
         raise FileNotFoundError(f"File `{proj_dir / '.env'}` does not exist.")
@@ -94,7 +98,7 @@ def load_conf() -> _Config:
         proj_dir=proj_dir,
         cache_dir=Path(resolved["CACHE_DIR"]).resolve(),
         chroma_index_dir=Path(resolved["CHROMA_INDEX_DIR"]).resolve(),
-        router_url=resolved["ROUTER_URL"],
+        hf_router_url=resolved["HF_ROUTER_URL"],
         langsmith_api_url=resolved["LANGSMITH_API_URL"]
     )
     models = _Models(
