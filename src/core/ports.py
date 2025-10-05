@@ -6,8 +6,6 @@ be modified, different techniques could be used without the need to refactor.
 from typing import Protocol, List, Optional
 
 from langchain.prompts import PromptTemplate
-from langchain_core.language_models import BaseChatModel
-from langchain_core.retrievers import BaseRetriever
 from langchain_core.documents import Document
 
 from core.types import QueryStr, ResponseStr, QueryList, TranslationContext
@@ -30,7 +28,7 @@ class TextSplitter(Protocol):
 
 
 class QueryTranslator(Protocol):
-    def translate( self, query: QueryStr, ctx: Optional[TranslationContext] = None) -> QueryList:
+    def translate( self, ctx: Optional[TranslationContext]) -> QueryList:
         ...
 
 

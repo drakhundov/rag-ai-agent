@@ -5,7 +5,7 @@ from langchain_core.prompts import PromptTemplate
 
 from core.config import load_conf
 from core.ports import ChatModel
-from core.types import QueryStr, QueryList, TranslationContext
+from core.types import QueryList, TranslationContext
 
 
 # Since all query translation methods share the same steps, I've implemented
@@ -20,7 +20,7 @@ class _QueryTranslatorImpl:
         self.chat_model = chat_model
         self.prompt_templ = prompt_templ
 
-    def run(self, query: QueryStr | None, ctx_dict: Dict | None) -> QueryList:
+    def run(self, ctx_dict: Dict) -> QueryList:
         ctx_dict = ctx_dict or {}
         chain = (
             self.prompt_templ |
@@ -28,15 +28,11 @@ class _QueryTranslatorImpl:
             StrOutputParser() |
             (lambda x: x.split("\n"))
         )
-        if query is not None:
-            ctx_dict.update({"query": query})
-        elif ctx_dict.get("query") is None:
-            raise ValueError("Either query or ctx['query'] must be provided.")
         llm_response = chain.invoke(ctx_dict)
         # Remove dupliates while preserving order.
         queries = []
         seen = set()
-        for s in [query, *llm_response]:
+        for s in llm_response:
             s_norm = s.strip()
             if s_norm and s_norm not in seen:
                 seen.add(s_norm)
@@ -59,8 +55,8 @@ class MultiQueryTranslator:
             prompt_templ=prompt_templ
         )
 
-    def translate(self, query: QueryStr, ctx: TranslationContext) -> QueryList:
-        return self._impl.run(query, ctx.to_dict())
+    def translate(self, ctx: TranslationContext) -> QueryList:
+        return self._impl.run(ctx.to_dict())
 
 
 class HyDETranslator:
@@ -75,8 +71,8 @@ class HyDETranslator:
             prompt_templ=prompt_templ
         )
 
-    def translate(self, query: QueryStr, ctx: TranslationContext) -> QueryList:
-        return self._impl.run(query, ctx.to_dict())
+    def translate(self, ctx: TranslationContext) -> QueryList:
+        return self._impl.run(ctx.to_dict())
 
 
 class DecompositionTranslator:
@@ -91,8 +87,8 @@ class DecompositionTranslator:
             prompt_templ=prompt_templ
         )
 
-    def translate(self, query: QueryStr, ctx: TranslationContext) -> QueryList:
-        return self._impl.run(query, ctx.to_dict())
+    def translate(self, ctx: TranslationContext) -> QueryList:
+        return self._impl.run(ctx.to_dict())
 
 
 class StepBackTranslator:
@@ -107,15 +103,15 @@ class StepBackTranslator:
             prompt_templ=prompt_templ
         )
 
-    def translate(self, query: QueryStr, ctx: TranslationContext) -> QueryList:
-        return self._impl.run(query, ctx.to_dict())
+    def translate(self, ctx: TranslationContext) -> QueryList:
+        return self._impl.run(ctx.to_dict())
 
 
 class IdentityTranslator:
     def __init__(self, chat_model: Optional[ChatModel] = None):
         pass
 
-    def translate(self, query: QueryStr, ctx: TranslationContext) -> QueryList:
+    def translate(self, ctx: TranslationContext) -> QueryList:
         return QueryList(
             original_query=query,
             queries=[query]
