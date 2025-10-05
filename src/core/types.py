@@ -11,6 +11,7 @@ class TranslationMethod(Enum):
     HYDE = "hyde"
     IDENTITY = "identity"
 
+TranslationRoute = NewType("TranslationRoute", List[TranslationMethod])
 
 class TranslationRouter(Enum):
     HEURISTIC = "heuristic"
@@ -34,7 +35,6 @@ class TranslationContext:
 class QueryList:
     original_query: QueryStr
     queries: List[QueryStr]
-    route: Optional[List[TranslationMethod]] = None
     translation_router: Optional[TranslationRouter] = None
 
     def __iter__(self):
@@ -45,6 +45,17 @@ class QueryList:
 
     def __getitem__(self, index):
         return self.queries[index]
+
+    def __eq__(self, other: 'QueryList'):
+        if not isinstance(other, QueryList):
+            return False
+        return (self.original_query == other.original_query and
+                self.translation_router == other.translation_router)
+    
+    def extend(self, querylst: 'QueryList'):
+        if self != querylst:
+            raise ValueError("Cannot extend QueryList with a different original_query or translation_router")
+        self.queries.extend(querylst.queries)
 
     def add_step(self, method: TranslationMethod):
         if not method in self.route:
