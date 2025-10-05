@@ -24,7 +24,7 @@ class _QueryTranslatorImpl:
         ctx_dict = ctx_dict or {}
         chain = (
             self.prompt_templ |
-            self.chat_model.as_langchain() |
+            self.chat_model |
             StrOutputParser() |
             (lambda x: x.split("\n"))
         )
@@ -95,12 +95,12 @@ class DecompositionTranslator:
         return self._impl.run(query, ctx.to_dict())
 
 
-class StepUpTranslator:
+class StepBackTranslator:
     def __init__(self, chat_model: ChatModel):
         with load_conf() as conf:
             prompt_templ = PromptTemplate(
-                input_variables=conf.prompt_templs.step_up_rag_prompt.input_variables,
-                template=conf.prompt_templs.step_up_rag_prompt.template
+                input_variables=conf.prompt_templs.step_back_rag_prompt.input_variables,
+                template=conf.prompt_templs.step_back_rag_prompt.template
             )
         self._impl = _QueryTranslatorImpl(
             chat_model=chat_model,
@@ -112,6 +112,9 @@ class StepUpTranslator:
 
 
 class IdentityTranslator:
+    def __init__(self, chat_model: Optional[ChatModel] = None):
+        pass
+
     def translate(self, query: QueryStr, ctx: TranslationContext) -> QueryList:
         return QueryList(
             original_query=query,
