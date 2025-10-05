@@ -113,6 +113,6 @@ class IdentityTranslator:
 
     def translate(self, ctx: TranslationContext) -> QueryList:
         return QueryList(
-            original_query=query,
-            queries=[query]
+            original_query=ctx.query,
+            queries=[ctx.query]
         )
