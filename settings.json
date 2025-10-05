@@ -34,14 +34,14 @@
                 "query",
                 "quantity"
             ],
-            "TEMPLATE": "Decompose the following question into {quantity} simpler sub-questions that can each be answered with a short passage from a document:\nQuestion: {question}\nSub-questions:"
+            "TEMPLATE": "Decompose the following question into {quantity} simpler sub-questions that can each be answered with a short passage from a document without numbering and without bold or italic text:\nQuestion: {query}\nSub-questions:"
         },
         "STEP_BACK_RAG_PROMPT": {
             "INPUT_VARIABLES": [
                 "query",
                 "quantity"
             ],
-            "TEMPLATE": "Generalize the following question into {quantity} more abstract questions that can each be answered with a short passage from a document:\nQuestion: {question}\nAbstract questions:"
+            "TEMPLATE": "Generalize the following question into {quantity} more abstract questions that can each be answered with a short passage from a document (without numbering and without bold or italic text):\nQuestion: {query}\nAbstract questions:"
         }
     },
     "SENTENCE_CONCAT_BUFSZ": 2,
