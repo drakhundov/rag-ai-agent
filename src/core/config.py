@@ -25,7 +25,7 @@ class _PromptTempls:
     multi_query_rag_prompt: _PromptTempl
     hyde_rag_prompt: _PromptTempl
     decomposition_rag_prompt: _PromptTempl
-    step_up_rag_prompt: _PromptTempl
+    step_back_rag_prompt: _PromptTempl
 
 
 @dataclass(frozen=True)
@@ -73,7 +73,7 @@ def load_conf() -> _Config:
     else:
         # This file's path: PROJ_DIR/src/config.py
         # Thus, we need the second parent.
-        proj_dir = Path(__file__).resolve().parents[1]
+        proj_dir = Path(__file__).resolve().parents[2]
     # Load variables from the '.env' file.
     if not os.path.exists(proj_dir / ".env"):
         raise FileNotFoundError(f"File `{proj_dir / '.env'}` does not exist.")
@@ -122,9 +122,9 @@ def load_conf() -> _Config:
             input_variables=resolved["PROMPT_TEMPLATES"]["DECOMPOSITION_RAG_PROMPT"]["INPUT_VARIABLES"],
             template=resolved["PROMPT_TEMPLATES"]["DECOMPOSITION_RAG_PROMPT"]["TEMPLATE"],
         ),
-        step_up_rag_prompt=_PromptTempl(
-            input_variables=resolved["PROMPT_TEMPLATES"]["STEP_UP_RAG_PROMPT"]["INPUT_VARIABLES"],
-            template=resolved["PROMPT_TEMPLATES"]["STEP_UP_RAG_PROMPT"]["TEMPLATE"],
+        step_back_rag_prompt=_PromptTempl(
+            input_variables=resolved["PROMPT_TEMPLATES"]["STEP_BACK_RAG_PROMPT"]["INPUT_VARIABLES"],
+            template=resolved["PROMPT_TEMPLATES"]["STEP_BACK_RAG_PROMPT"]["TEMPLATE"],
         )
     )
     return _Config(

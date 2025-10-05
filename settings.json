@@ -1,11 +1,11 @@
 {
     "MODELS": {
-        "DEFAULT_CHAT_MODEL": "openai/gpt-oss-120b",
+        "DEFAULT_CHAT_MODEL": "openai/gpt-oss-20b",
         "DEFAULT_EMB_MODEL": "BAAI/bge-m3"
     },
     "CACHE_DIR": "${PROJ_DIR}/cache",
     "CHROMA_INDEX_DIR": "${CACHE_DIR}/chroma_index",
-    "ROUTER_URL": "https://router.huggingface.co/v1",
+    "HF_ROUTER_URL": "https://router.huggingface.co/v1",
     "LANGSMITH_API_URL": "https://api.smith.langchain.com",
     "PROMPT_TEMPLATES": {
         "SYSTEM": {
@@ -24,9 +24,10 @@
         },
         "HYDE_RAG_PROMPT": {
             "INPUT_VARIABLES": [
-                "query"
+                "query",
+                "max_tokens"
             ],
-            "TEMPLATE": "Generate a scientific paper passage to answer the query.\nQuestion: {query}\n\nPassage:"
+            "TEMPLATE": "Generate a scientific paper passage to answer the query. Maximum number of tokens: {max_tokens}.\nQuestion: {query}\n\nPassage:"
         },
         "DECOMPOSITION_RAG_PROMPT": {
             "INPUT_VARIABLES": [
@@ -35,7 +36,7 @@
             ],
             "TEMPLATE": "Decompose the following question into {quantity} simpler sub-questions that can each be answered with a short passage from a document:\nQuestion: {question}\nSub-questions:"
         },
-        "STEP_UP_RAG_PROMPT": {
+        "STEP_BACK_RAG_PROMPT": {
             "INPUT_VARIABLES": [
                 "query",
                 "quantity"
