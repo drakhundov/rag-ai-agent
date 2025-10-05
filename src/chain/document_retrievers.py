@@ -5,7 +5,6 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
-from langchain_core.vectorstores import VectorStoreRetriever
 
 from core.config import load_conf
 from core.ports import TextSplitter
@@ -50,12 +49,13 @@ class ChromaDocumentRetriever:
             )
         self.add_docs(chunks)
 
-    def retrieve(self, query: str, k: int = 4) -> list[Document]:
-        return self.vs.as_retriever(search_kwargs={"k": k}).invoke(query)
+    def retrieve(self, query: str, top_k: int = 4) -> list[Document]:
+        return self.vs.as_retriever(search_kwargs={"k": top_k}).invoke(query)
 
     def add_docs(self, docs: List[Document]):
         self.vs.add_documents(docs)
         self.vs.persist()  # Write changes to disk.
 
-    def __ror__(self, other):
-        return other | self.vs.as_retriever()
+    # ! Used to make sure compatibility with LangChain pipelines.
+    def invoke(self, input, *args, **kwargs):
+        return self.vs.as_retriever(kwargs).invoke(input, *args, **kwargs)
