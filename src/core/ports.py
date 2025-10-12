@@ -34,6 +34,8 @@ class QueryTranslator(Protocol):
 
 # Defined in routing/HeuristicRouter.py
 class TranslationRouter:
-    @staticmethod
-    def route(self, query: QueryStr, chat_model: ChatModel, ctx: Optional[TranslationContext] = None) -> QueryList:
+    def __init__(self, chat_model: ChatModel):
+        ...
+
+    def route(self, ctx: TranslationContext) -> QueryList:
         ...
