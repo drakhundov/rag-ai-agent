@@ -10,6 +10,8 @@ class TranslationMethod(Enum):
     MULTI_QUERY = "multi-query"
     HYDE = "hyde"
     IDENTITY = "identity"
+    STEPBACK = "stepback"
+    DECOMPOSITION = "decomposition"
 
 TranslationRoute = NewType("TranslationRoute", List[TranslationMethod])
 
@@ -31,11 +33,17 @@ class TranslationContext:
         }
 
 
+@dataclass(frozen=True)
+class HeuristicAnalysisParameters:
+    short_len_le: int = 12  # queries with length <= this are considered short
+
+
 @dataclass
 class QueryList:
     original_query: QueryStr
     queries: List[QueryStr]
     translation_router: Optional[TranslationRouter] = None
+    route: TranslationRoute = None
 
     def __iter__(self):
         return iter(self.queries)
