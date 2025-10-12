@@ -4,9 +4,10 @@ from langchain.prompts import PromptTemplate
 from langchain_core.documents import Document
 
 from core.ports import DocumentRetriever, ChatModel
-from utilities.fusion import perform_reciprocal_rank_fusion
+from core.types import QueryStr, QueryList, TranslationContext
+from routing.HeuristicRouter import HeuristicRouter
+# from utilities.fusion import perform_reciprocal_rank_fusion
 
-# TODO: incorporate different query translation strategies.
 
 class RAGEngine:
     def __init__(
@@ -16,7 +17,16 @@ class RAGEngine:
         self.chat_model = chat_model
         self.sys_prompt_template = sys_prompt_template
 
-    def generate_answer(self, query: str, top_k: int = 4) -> str:
+    def generate_answer(self, query: QueryStr, top_k: int = 4) -> str:
         # TODO: incorporate heuristic routing, query translation, and fusion.
-        ctx: List[Document] = self.doc_retriever.retrieve(query, top_k=top_k)
-        return self.chat_model.generate(self.sys_prompt_template, query, ctx)
+        router = HeuristicRouter(
+            ctx=TranslationContext(query=query, quantity=top_k, max_tokens=256),
+            chat_model=self.chat_model
+        )
+        router.route()
+        qlist: QueryList = router.run_route()
+        docs: List[Document] = []
+        for q in qlist:
+            docs.extend(self.doc_retriever.retrieve(q, top_k=top_k))
+        # docs = perform_reciprocal_rank_fusion(docs, k=top_k)
+        return self.chat_model.generate(self.sys_prompt_template, query, docs)
