@@ -1,7 +1,6 @@
 """Analyzes a given query in order to determine the most suitable translation methods."""
-from typing import Dict
 
-from core.types import QueryStr, HeuristicAnalysisParameters
+from core.types import QueryStr, HeuristicAnalysisParameters, HeuristicAnalysis
 
 
 class HeuristicAnalyzer:
@@ -9,18 +8,19 @@ class HeuristicAnalyzer:
         self.query = query
         self.params = params
 
-    def analyze(self) -> Dict[str, bool]:
-        return {
+    def analyze(self) -> HeuristicAnalysis:
+        return HeuristicAnalysis({
             "is_question": self.query.strip().endswith("?"),
             "has_logical_operators": any(op in self.query.lower() for op in [" and ", " or ", " not "]),
-            "is_comparative": any(comp in self.query.lower() for comp in [" better ", " worse ", " more ", " less ", " than "]),
+            "is_comparative": any(
+                comp in self.query.lower() for comp in [" better ", " worse ", " more ", " less ", " than "]),
             "is_how_to": self.query.lower().startswith("how to"),
             "is_short": len(self.query.split()) <= self.params.short_len_le,
             "is_ambiguous": any(word in self.query.lower() for word in ["maybe", "possibly", "could", "might"])
-        }
+        })
 
     @staticmethod
-    def check_format(analysis: Dict[str]) -> bool:
+    def check_format(analysis: HeuristicAnalysis) -> bool:
         required_keys = [
             "is_question",
             "has_logical_operators",

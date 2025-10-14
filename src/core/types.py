@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import NewType, List, Optional
+from typing import NewType, List, Optional, Dict
 
 QueryStr = NewType("QueryStr", str)
 ResponseStr = NewType("ResponseStr", str)
@@ -37,6 +37,7 @@ class TranslationContext:
 class HeuristicAnalysisParameters:
     short_len_le: int = 12  # queries with length <= this are considered short
 
+HeuristicAnalysis = NewType("HeuristicAnalysis", Dict[str, bool])
 
 @dataclass
 class QueryList:
