@@ -5,7 +5,7 @@ import os
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 
 import dotenv
 from pydantic import SecretStr

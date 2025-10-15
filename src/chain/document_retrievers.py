@@ -8,9 +8,10 @@ from langchain_core.embeddings import Embeddings
 
 from core.config import load_conf
 from core.ports import TextSplitter
-
+from core.types import QueryStr
 
 # TODO: cache which documents have been indexed etc.
+
 
 # Interface: ports/DocumentRetriever
 class ChromaDocumentRetriever:
@@ -19,7 +20,7 @@ class ChromaDocumentRetriever:
         docs: List[Document],
         text_splitter: TextSplitter,
         chroma_index_dir: str = None,
-        emb_model: Embeddings = None
+        emb_model: Embeddings = None,
     ):
         with load_conf() as conf:
             if chroma_index_dir is None:
@@ -49,7 +50,7 @@ class ChromaDocumentRetriever:
             )
         self.add_docs(chunks)
 
-    def retrieve(self, query: str, top_k: int = 4) -> list[Document]:
+    def retrieve(self, query: QueryStr, top_k: int = 4) -> List[Document]:
         return self.vs.as_retriever(search_kwargs={"k": top_k}).invoke(query)
 
     def add_docs(self, docs: List[Document]):
