@@ -21,6 +21,9 @@ def start():
 @cl.on_message
 async def on_message(msg: str | cl.Message):
     global rag_svc
+    if rag_svc is None:
+        await cl.Message("Error: RAG engine not initialized. Please start a new chat session.").send()
+        return
     text = msg if isinstance(msg, str) else msg.content
     answer = await anyio.to_thread.run_sync(rag_svc.generate_answer, text)
     await cl.Message(answer).send()
