@@ -4,7 +4,7 @@ import anyio
 import chainlit as cl
 
 from app_composition import build_rag_engine, setup_langsmith
-from services.rag_engine import RAGEngine
+from services.RAGEngine import RAGEngine
 
 rag_svc: Optional[RAGEngine] = None
 

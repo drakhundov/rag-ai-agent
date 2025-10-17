@@ -5,7 +5,7 @@ from langchain_community.document_loaders import PyPDFLoader
 
 from chain import OpenAIChatModel, ChromaDocumentRetriever, SemanticTextSplitter
 from core.config import load_conf
-from services.rag_engine import RAGEngine
+from services.RAGEngine import RAGEngine
 
 
 # Ensure imports could omit "src".
