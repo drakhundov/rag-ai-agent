@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 # ! Use 'PYTHONPATH=src pytest'
-from config import load_conf
+from core.config import load_conf
 
 PROJ_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -20,6 +20,7 @@ def with_temp_conf(tmp_path, monkeypatch):
 
 
 def test_config_load(with_temp_conf):
+    os.environ["PROJ_DIR"] = str(with_temp_conf)
     conf = load_conf()
 
     assert str(conf.paths.proj_dir) == PROJ_DIR
@@ -27,3 +28,13 @@ def test_config_load(with_temp_conf):
     assert conf.prompt_templs.system.input_variables is not None
     assert conf.prompt_templs.system.template is not None
     assert str(conf.paths.chroma_index_dir) == os.path.join(PROJ_DIR, "cache/chroma_index")
+
+
+def test_path_resolution(with_temp_conf):
+    os.environ["PROJ_DIR"] = str(with_temp_conf)
+    conf = load_conf()
+
+    assert conf.paths.cache_dir.is_absolute()
+    assert conf.paths.chroma_index_dir.is_absolute()
+    assert conf.paths.hf_router_url.startswith("http")
+    assert conf.paths.langsmith_api_url.startswith("http")
