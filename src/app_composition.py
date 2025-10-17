@@ -1,12 +1,15 @@
 import os
+from typing import List
+import logging
 
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 from langchain_community.document_loaders import PyPDFLoader
 
 from chain import OpenAIChatModel, ChromaDocumentRetriever, SemanticTextSplitter
 from core.config import load_conf
 from services.RAGEngine import RAGEngine
 
+logger: logging.Logger = logging.getLogger(__name__)
 
 # Ensure imports could omit "src".
 # sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -19,9 +22,13 @@ def setup_langsmith():
         os.environ["LANGSMITH_ENDPOINT"] = conf.paths.langsmith_api_url
         os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-
-def build_rag_engine() -> RAGEngine:
-    docs = PyPDFLoader("context.pdf").load()
+    
+def build_rag_engine(filepaths: List[str]) -> RAGEngine:
+    docs = []
+    for fpath in filepaths:
+        logger.debug(f"Loading document from {fpath}")
+        loader = PyPDFLoader(fpath)
+        docs.extend(loader.load())
     doc_retriever = ChromaDocumentRetriever(
         docs=docs,
         text_splitter=SemanticTextSplitter()

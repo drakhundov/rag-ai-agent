@@ -18,6 +18,8 @@ class SemanticTextSplitter:
         bufsz: int = None,
         breakpoint_percentile_threshold: int = None,
     ):
+        logger.debug("Starting SemanticTextSplitter initialization")
+        
         self.conf = load_conf()
         if bufsz is None:
             bufsz = self.conf.concat_bufsz

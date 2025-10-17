@@ -1,7 +1,7 @@
 from typing import List
 
 import numpy as np
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEndpointEmbeddings
 
 from core.config import load_conf
 
@@ -39,6 +39,9 @@ def embed_texts(texts: List[str], model_name: str = None) -> np.ndarray:
     if model_name is None:
         # Use the default embedding model if not specified.
         model_name = conf.models.emb_model_name
-    encoder = HuggingFaceEmbeddings(model_name=model_name)
+    encoder = HuggingFaceEndpointEmbeddings(
+        model=model_name,
+        huggingfacehub_api_token=conf.hf_token.get_secret_value()
+    )
     embs = encoder.embed_documents(texts)
     return np.array(embs, dtype=np.float32)

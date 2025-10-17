@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 from langchain_core.documents import Document
 from langchain_core.runnables import Runnable
 from langchain_openai import ChatOpenAI
@@ -16,6 +16,7 @@ logger: logging.Logger = logging.getLogger(__name__)
 # Interface: ports/ChatModel
 class OpenAIChatModel(Runnable):
     def __init__(self, model_name: str = None, api_key: SecretStr = None):
+        logger.debug("Starting OpenAIChatModel initialization")
         self.conf = load_conf()
         if model_name is None:
             model_name = self.conf.models.chat_model_name

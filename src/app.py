@@ -67,7 +67,8 @@ def main():
     parser.add_argument(
         "--shell", action="store_true", help="Run the assistant in shell mode."
     )
-    args = parser.parse_args(sys.argv[1:])
+    flags = [arg for arg in sys.argv[1:] if arg.startswith("-")]
+    args = parser.parse_args(flags)
 
     if args.cl:
         run_web_mode(rag_svc)
@@ -82,12 +83,13 @@ if __name__ == "__main__":
         format="%(asctime)s [%(levelname)s] %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
         handlers=[
-            logging.StreamHandler(sys.stdout),
             logging.FileHandler(".log", mode="a", encoding="utf-8"),
         ],
     )
     logger = logging.getLogger(__name__)
     logger.info("Logging is configured")
     logger.info("Starting RAG Assistant Application")
-    rag_svc = build_rag_engine()
+    # Takes file paths as positional argument.
+    files = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
+    rag_svc = build_rag_engine(files)
     main()

@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 from langchain_core.documents import Document
 
 from core.ports import DocumentRetriever, ChatModel

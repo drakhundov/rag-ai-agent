@@ -2,8 +2,8 @@ import logging
 import os
 from typing import List
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import Chroma
+from langchain_huggingface import HuggingFaceEndpointEmbeddings
+from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 
@@ -25,11 +25,15 @@ class ChromaDocumentRetriever:
         chroma_index_dir: str = None,
         emb_model: Embeddings = None,
     ):
+        logger.debug("Starting ChromaDocumentRetriever initialization")
         with load_conf() as conf:
             if chroma_index_dir is None:
-                chroma_index_dir = conf.paths.chroma_index_dir
+                chroma_index_dir = str(conf.paths.chroma_index_dir)
             if emb_model is None:
-                emb_model = HuggingFaceEmbeddings(model_name=conf.models.emb_model_name)
+                emb_model = HuggingFaceEndpointEmbeddings(
+                    model=conf.models.emb_model_name,
+                    huggingfacehub_api_token=conf.hf_token.get_secret_value(),
+                )
         self.persist_dir = chroma_index_dir
         self.emb_model = emb_model
         self.text_splitter = text_splitter
@@ -61,7 +65,8 @@ class ChromaDocumentRetriever:
     def add_docs(self, docs: List[Document]):
         logger.debug(f"Adding {len(docs)} documents to the retriever")
         self.vs.add_documents(docs)
-        self.vs.persist()  # Write changes to disk.
+        if callable(getattr(self.vs, "persist", None)):
+            self.vs.persist()
 
     # ! Used to make sure compatibility with LangChain pipelines.
     def invoke(self, input, *args, **kwargs):

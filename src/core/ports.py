@@ -5,7 +5,7 @@ be modified, different techniques could be used without the need to refactor.
 
 from typing import Protocol, List, Optional
 
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 from langchain_core.documents import Document
 
 from core.types import QueryStr, ResponseStr, QueryList, TranslationContext
