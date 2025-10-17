@@ -1,9 +1,14 @@
-from typing import List, Optional
+import logging
+from typing import List
 
-from chain.query_translators import MultiQueryTranslator, HyDETranslator, IdentityTranslator, StepBackTranslator, DecompositionTranslator
+from chain.query_translators import MultiQueryTranslator, HyDETranslator, IdentityTranslator, StepBackTranslator, \
+    DecompositionTranslator
 from core.ports import ChatModel
 from core.types import QueryList, TranslationMethod, TranslationContext, TranslationRouter
 from routing.HeuristicAnalyzer import HeuristicAnalyzer
+
+logger: logging.Logger = logging.getLogger(__name__)
+
 
 # Interface: ports/TranslationRouter
 class HeuristicRouter:
@@ -25,8 +30,10 @@ class HeuristicRouter:
             TranslationMethod.STEPBACK: StepBackTranslator(chat_model=self.chat_model),
             TranslationMethod.DECOMPOSITION: DecompositionTranslator(chat_model=self.chat_model),
         }
+        logger.debug(f"HeuristicRouter initialized (query='{self.ctx.query}')")
 
     def route(self):
+        logger.debug("Routing the query...")
         # Figure out the pipeline.
         q = self.ctx.query
         q_len = len(q.split())
@@ -43,9 +50,11 @@ class HeuristicRouter:
             self.add_translation_step(TranslationMethod.HYDE)
 
         self.route_constructed = True
+        logger.debug(f"HeuristicRouter route: {self.route}")
 
     def add_translation_step(self, method: TranslationMethod):
         """Use to construct the route."""
+        logger.debug(f"Adding translation step: {method.name}")
         if self.qlist is None:
             raise ValueError("`qlist` hasn't been initialized yet.")
         elif not isinstance(method, TranslationMethod):
@@ -54,6 +63,7 @@ class HeuristicRouter:
 
     def run_route(self) -> QueryList:
         """Execute the route."""
+        logger.debug("Running the constructed route...")
         if not self.route_constructed:
             raise RuntimeError("Route hasn't been constructed yet. Call `route()` first.")
         self.translators: List = [self.translator_map[method] for method in self.qlist.route]

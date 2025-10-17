@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 from langchain.prompts import PromptTemplate
@@ -7,6 +8,8 @@ from core.ports import DocumentRetriever, ChatModel
 from core.types import QueryStr, QueryList, TranslationContext
 from routing.HeuristicRouter import HeuristicRouter
 from utilities.fusion import perform_reciprocal_rank_fusion
+
+logger: logging.Logger = logging.getLogger(__name__)
 
 
 class RAGEngine:
@@ -18,6 +21,7 @@ class RAGEngine:
         self.sys_prompt_template = sys_prompt_template
 
     def generate_answer(self, query: QueryStr, top_k: int = 4) -> str:
+        logger.debug(f"Generating answer for query: {query}")
         router = HeuristicRouter(
             ctx=TranslationContext(query=query, quantity=top_k, max_tokens=256),
             chat_model=self.chat_model

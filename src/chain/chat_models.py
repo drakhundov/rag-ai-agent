@@ -1,13 +1,16 @@
+import logging
 from typing import List
-from pydantic import SecretStr
 
 from langchain.prompts import PromptTemplate
 from langchain_core.documents import Document
-from langchain_openai import ChatOpenAI
 from langchain_core.runnables import Runnable
+from langchain_openai import ChatOpenAI
+from pydantic import SecretStr
 
 from core.config import load_conf
 from core.types import QueryStr, ResponseStr
+
+logger: logging.Logger = logging.getLogger(__name__)
 
 
 # Interface: ports/ChatModel
@@ -21,10 +24,12 @@ class OpenAIChatModel(Runnable):
         self._llm_model = ChatOpenAI(
             model=model_name, base_url=self.conf.paths.hf_router_url, api_key=api_key
         )
+        logger.debug("OpenAIChatModel initialized")
 
     def generate(
         self, prompt_templ: PromptTemplate, query: QueryStr, context: List[Document]
     ) -> ResponseStr:
+        logger.debug(f"Generating the answer for query: {query}")
         chain = prompt_templ | self._llm_model
         return ResponseStr(
             chain.invoke({"question": query, "context": context}).content

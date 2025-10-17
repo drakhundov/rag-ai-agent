@@ -1,9 +1,14 @@
+import logging
 from typing import List, Dict, Optional
 
 from langchain_core.documents import Document
 
+logger: logging.Logger = logging.getLogger(__name__)
 
-def perform_reciprocal_rank_fusion(docs: List[List[Document]], top_k: Optional[int] = None, k_rrf: int = 60) -> List[Document]:
+
+def perform_reciprocal_rank_fusion(docs: List[List[Document]], top_k: Optional[int] = None, k_rrf: int = 60) -> List[
+    Document]:
+    logger.debug("Performing reciprocal rank fusion")
     scores: Dict[str, float] = {}
     first_seen: Dict[str, Document] = {}
     for ranking in docs:

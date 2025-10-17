@@ -1,3 +1,4 @@
+import logging
 from typing import List, Dict
 
 import numpy as np
@@ -6,6 +7,8 @@ from langchain_core.documents import Document
 from core.config import load_conf
 from utilities.string import split_into_sentences, windowed_concat
 from utilities.vector import embed_texts, calc_pairwise_semantic_distances
+
+logger: logging.Logger = logging.getLogger(__name__)
 
 
 # Interface: ports/TextSplitter
@@ -23,11 +26,14 @@ class SemanticTextSplitter:
         self.bufsz = bufsz
         self.breakpoint_percentile_threshold = breakpoint_percentile_threshold
 
+        logger.debug("SemanticTextSplitter initialized")
+
     def split(self, docs: List[Document]) -> List[Document]:
         """
         Chunk each Document into semantically-cohesive pieces using sentence-level
         embedding distances. Works with LangChain Documents.
         """
+        logger.debug(f"Splitting {len(docs)} documents")
         all_chunks: List[Document] = []
         for doc in docs:
             sentences = split_into_sentences(doc.page_content)

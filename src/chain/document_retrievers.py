@@ -1,3 +1,4 @@
+import logging
 import os
 from typing import List
 
@@ -11,6 +12,8 @@ from core.ports import TextSplitter
 from core.types import QueryStr
 
 # TODO: cache which documents have been indexed etc.
+
+logger: logging.Logger = logging.getLogger(__name__)
 
 
 # Interface: ports/DocumentRetriever
@@ -33,6 +36,7 @@ class ChromaDocumentRetriever:
         self.docs = docs
         self.vs = None
         self._initialize_index()
+        logger.debug("ChromaDocumentRetriever initialized")
 
     def _initialize_index(self):
         """Initialize the vectorstore if hasn't been initialized yet."""
@@ -51,9 +55,11 @@ class ChromaDocumentRetriever:
         self.add_docs(chunks)
 
     def retrieve(self, query: QueryStr, top_k: int = 4) -> List[Document]:
+        logger.debug(f"Retrieving {query}")
         return self.vs.as_retriever(search_kwargs={"k": top_k}).invoke(query)
 
     def add_docs(self, docs: List[Document]):
+        logger.debug(f"Adding {len(docs)} documents to the retriever")
         self.vs.add_documents(docs)
         self.vs.persist()  # Write changes to disk.
 

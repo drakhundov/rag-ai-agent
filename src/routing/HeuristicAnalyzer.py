@@ -1,6 +1,9 @@
 """Analyzes a given query in order to determine the most suitable translation methods."""
+import logging
 
 from core.types import QueryStr, HeuristicAnalysisParameters, HeuristicAnalysis
+
+logger: logging.Logger = logging.getLogger(__name__)
 
 
 class HeuristicAnalyzer:
@@ -9,6 +12,7 @@ class HeuristicAnalyzer:
         self.params = params
 
     def analyze(self) -> HeuristicAnalysis:
+        logger.debug(f"Analyzing query: {self.query}")
         return HeuristicAnalysis({
             "is_question": self.query.strip().endswith("?"),
             "has_logical_operators": any(op in self.query.lower() for op in [" and ", " or ", " not "]),
