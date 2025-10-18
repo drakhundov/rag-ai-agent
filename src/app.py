@@ -25,7 +25,6 @@ def run_web_mode(rag_svc: RAGEngine):
     @cl.on_chat_start
     def start():
         # ! Might want to reconsider for production environment.
-        setup_langsmith()
         rag_svc = build_rag_engine()
         cl.user_session.set("rag_engine", rag_svc)
         cl.user_session.set("chat_history", [])
@@ -48,11 +47,11 @@ def run_terminal_mode(rag_svc: RAGEngine):
     logger.info("Running terminal mode")
     try:
         while True:
-            user_input = input("[User] >> ")
+            user_input = input(">> ")
             if not user_input:
                 continue
             answer = rag_svc.generate_answer(user_input)
-            print(f"Assistant: {answer}")
+            print(f"\033[96m{answer}\033[0m")
     except KeyboardInterrupt:
         print("\nExiting...")
 

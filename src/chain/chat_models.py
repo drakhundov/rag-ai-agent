@@ -33,7 +33,7 @@ class OpenAIChatModel(Runnable):
         logger.debug(f"Generating the answer for query: {query}")
         chain = prompt_templ | self._llm_model
         return ResponseStr(
-            chain.invoke({"question": query, "context": context}).content
+            chain.invoke({"query": query, "context": context}).content
         )
 
     # ! Used to make sure compatibility with LangChain pipelines.

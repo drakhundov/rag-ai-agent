@@ -8,7 +8,13 @@ from typing import Protocol, List, Optional
 from langchain_core.prompts import PromptTemplate
 from langchain_core.documents import Document
 
-from core.types import QueryStr, ResponseStr, QueryList, TranslationContext
+from core.types import (
+    QueryStr,
+    ResponseStr,
+    QueryList,
+    TranslationContext,
+    TranslationRouter,
+)
 
 
 class ChatModel(Protocol):
@@ -18,24 +24,14 @@ class ChatModel(Protocol):
 
 
 class DocumentRetriever(Protocol):
-    def retrieve(self, query: QueryStr, top_k: int = 4) -> List[Document]:
-        ...
+    def retrieve(self, query: QueryStr, top_k: int = 4) -> List[Document]: ...
 
 
 class TextSplitter(Protocol):
-    def split(self, docs: List[Document]) -> List[Document]:
-        ...
+    def split(self, docs: List[Document]) -> List[Document]: ...
 
 
 class QueryTranslator(Protocol):
-    def translate( self, ctx: Optional[TranslationContext]) -> QueryList:
-        ...
-
-
-# Defined in routing/HeuristicRouter.py
-class TranslationRouter:
-    def __init__(self, chat_model: ChatModel):
-        ...
-
-    def route(self, ctx: TranslationContext) -> QueryList:
-        ...
+    def translate(
+        self, ctx: TranslationContext, router: TranslationRouter
+    ) -> QueryList: ...
