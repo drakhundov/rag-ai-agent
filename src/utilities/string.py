@@ -72,3 +72,32 @@ def windowed_concat(sentences: List[str], bufsz: int) -> List[str]:
         end = min(n, i + bufsz + 1)
         windowed.append(" ".join(sentences[start:end]))
     return windowed
+
+
+def format_response(response: str) -> str:
+    """
+    Convert simple asterisk-based markup to ANSI terminal formatting:
+    - **bold** -> bold (ANSI \033[1m)
+    - *italic* -> italic (ANSI \033[3m)
+
+    Inline code spans wrapped in backticks (`code`) are left untouched.
+    """
+    if response is None:
+        return ""
+
+    def _format_segment(text: str) -> str:
+        # bold first (**) then single-star italics; use non-greedy matches
+        text = re.sub(r"\*\*(.+?)\*\*", lambda m: f"\033[1m{m.group(1)}\033[0m", text)
+        text = re.sub(
+            r"(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)",
+            lambda m: f"\033[3m{m.group(1)}\033[0m",
+            text,
+        )
+        return text
+
+    # Preserve backtick-enclosed code spans by not formatting them
+    parts = re.split(r"(`+[^`]*`+)", response)
+    formatted = "".join(
+        _format_segment(p) if i % 2 == 0 else p for i, p in enumerate(parts)
+    )
+    return formatted

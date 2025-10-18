@@ -6,6 +6,7 @@ import anyio
 
 from app_composition import build_rag_engine, setup_langsmith
 from services.RAGEngine import RAGEngine
+from utilities.string import format_response
 
 setup_langsmith()
 
@@ -37,8 +38,8 @@ def run_web_mode(rag_svc: RAGEngine):
             ).send()
             return
         text = msg if isinstance(msg, str) else msg.content
-        answer = await anyio.to_thread.run_sync(rag_svc.generate_answer, text)
-        await cl.Message(answer).send()
+        response = await anyio.to_thread.run_sync(rag_svc.generate_answer, text)
+        await cl.Message(response).send()
 
     return
 
@@ -50,8 +51,8 @@ def run_terminal_mode(rag_svc: RAGEngine):
             user_input = input(">> ")
             if not user_input:
                 continue
-            answer = rag_svc.generate_answer(user_input)
-            print(f"\033[96m{answer}\033[0m")
+            response = rag_svc.generate_answer(user_input)
+            print(f"\033[96m{format_response(response)}\033[0m")
     except KeyboardInterrupt:
         print("\nExiting...")
 
