@@ -8,7 +8,7 @@ from core.config import load_conf
 from utilities.string import split_into_sentences, windowed_concat
 from utilities.vector import embed_texts, calc_pairwise_semantic_distances
 
-logger: logging.Logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger()
 
 
 # Interface: ports/TextSplitter

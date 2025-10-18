@@ -13,7 +13,7 @@ from core.types import QueryStr
 
 # TODO: cache which documents have been indexed etc.
 
-logger: logging.Logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger()
 
 
 # Interface: ports/DocumentRetriever

@@ -12,3 +12,4 @@ cache
 .editorconfig
 chainlit.md
 *.log
+logs/

@@ -8,7 +8,7 @@ from core.config import load_conf
 from core.ports import ChatModel
 from core.types import QueryList, TranslationContext, TranslationRouter
 
-logger: logging.Logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger()
 
 
 # Since all query translation methods share the same steps, I've implemented

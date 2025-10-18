@@ -10,7 +10,7 @@ from pydantic import SecretStr
 from core.config import load_conf
 from core.types import QueryStr, ResponseStr
 
-logger: logging.Logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger()
 
 
 # Interface: ports/ChatModel

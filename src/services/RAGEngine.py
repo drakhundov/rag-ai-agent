@@ -9,7 +9,7 @@ from core.types import QueryStr, QueryList, TranslationContext
 from routing.HeuristicRouter import HeuristicRouter
 from utilities.fusion import perform_reciprocal_rank_fusion
 
-logger: logging.Logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger()
 
 
 class RAGEngine:

@@ -9,7 +9,7 @@ from chain import OpenAIChatModel, ChromaDocumentRetriever, SemanticTextSplitter
 from core.config import load_conf
 from services.RAGEngine import RAGEngine
 
-logger: logging.Logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger()
 
 # Ensure imports could omit "src".
 # sys.path.append(os.path.dirname(os.path.abspath(__file__)))

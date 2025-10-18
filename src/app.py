@@ -1,10 +1,13 @@
 import argparse
 import logging
+import os
 import sys
+from datetime import datetime
 
 import anyio
 
 from app_composition import build_rag_engine, setup_langsmith
+from core.config import load_conf
 from services.RAGEngine import RAGEngine
 from utilities.string import format_response
 
@@ -78,18 +81,31 @@ def main():
 
 
 if __name__ == "__main__":
+    with load_conf() as conf:
+        proj_dir = str(conf.paths.proj_dir)
+    log_dir = os.path.join(proj_dir, "logs")
+    os.makedirs(log_dir, exist_ok=True)
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.DEBUG,
         format="%(asctime)s [%(levelname)s] %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
         handlers=[
-            logging.FileHandler(".log", mode="a", encoding="utf-8"),
+            logging.FileHandler(
+                os.path.join(
+                    log_dir, datetime.strftime(datetime.now(), "%Y%m%d_%H%M%S.log")
+                ),
+                mode="a",
+                encoding="utf-8",
+            ),
         ],
+        force=True,
     )
-    logger = logging.getLogger(__name__)
-    logger.info("Logging is configured")
-    logger.info("Starting RAG Assistant Application")
+    logger = logging.getLogger()
+    logger.debug("Logging is configured")
+    logger.debug("Starting RAG Assistant Application")
     # Takes file paths as positional argument.
     files = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
+    print("\rProcessing...")
     rag_svc = build_rag_engine(files)
+    print("\r\033[K")  # Clear the message and return cursor to the beginning.
     main()

@@ -18,7 +18,7 @@ from core.types import (
 )
 from routing.HeuristicAnalyzer import HeuristicAnalyzer
 
-logger: logging.Logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger()
 
 
 # Interface: ports/TranslationRouter
