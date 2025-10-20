@@ -6,7 +6,7 @@ from langchain_core.documents import Document
 logger: logging.Logger = logging.getLogger()
 
 
-def perform_reciprocal_rank_fusion(docs: List[List[Document]], top_k: Optional[int] = None, k_rrf: int = 60) -> List[
+def perform_rrf(docs: List[List[Document]], top_k: Optional[int] = None, k_rrf: int = 60) -> List[
     Document]:
     logger.debug("Performing reciprocal rank fusion")
     scores: Dict[str, float] = {}

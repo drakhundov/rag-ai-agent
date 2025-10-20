@@ -13,7 +13,9 @@ class TranslationMethod(Enum):
     STEPBACK = "stepback"
     DECOMPOSITION = "decomposition"
 
+
 TranslationRoute = NewType("TranslationRoute", List[TranslationMethod])
+
 
 class TranslationRouter(Enum):
     HEURISTIC = "heuristic"
@@ -37,7 +39,9 @@ class TranslationContext:
 class HeuristicAnalysisParameters:
     short_len_le: int = 12  # queries with length <= this are considered short
 
+
 HeuristicAnalysis = NewType("HeuristicAnalysis", Dict[str, bool])
+
 
 @dataclass
 class QueryList:
@@ -60,7 +64,7 @@ class QueryList:
             return False
         return (self.original_query == other.original_query and
                 self.translation_router == other.translation_router)
-    
+
     def extend(self, querylst: 'QueryList'):
         if self != querylst:
             raise ValueError("Cannot extend QueryList with a different original_query or translation_router")

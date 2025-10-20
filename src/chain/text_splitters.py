@@ -5,8 +5,7 @@ import numpy as np
 from langchain_core.documents import Document
 
 from core.config import load_conf
-from utilities.string import split_into_sentences, windowed_concat
-from utilities.vector import embed_texts, calc_pairwise_semantic_distances
+from utilities import string, vector
 
 logger: logging.Logger = logging.getLogger()
 
@@ -19,7 +18,7 @@ class SemanticTextSplitter:
         breakpoint_percentile_threshold: int = None,
     ):
         logger.debug("Starting SemanticTextSplitter initialization")
-        
+
         self.conf = load_conf()
         if bufsz is None:
             bufsz = self.conf.concat_bufsz
@@ -38,18 +37,18 @@ class SemanticTextSplitter:
         logger.debug(f"Splitting {len(docs)} documents")
         all_chunks: List[Document] = []
         for doc in docs:
-            sentences = split_into_sentences(doc.page_content)
+            sentences = string.split_into_sentences(doc.page_content)
             if len(sentences) <= 1:
                 # Nothing to chunk; keep as-is.
                 all_chunks.append(doc)
                 continue
 
             # Build local context windows per sentence and embed.
-            windowed = windowed_concat(sentences, self.bufsz)
-            embs_lst = embed_texts(windowed)
+            windowed = string.windowed_concat(sentences, self.bufsz)
+            embs_lst = vector.embed_texts(windowed)
 
             # Calculate distances between adjacent windows.
-            distances = calc_pairwise_semantic_distances(embs_lst)
+            distances = vector.calc_pairwise_semantic_distances(embs_lst)
             if not distances:
                 all_chunks.append(doc)
                 continue

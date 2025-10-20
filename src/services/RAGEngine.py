@@ -1,13 +1,13 @@
 import logging
 from typing import List
 
-from langchain_core.prompts import PromptTemplate
 from langchain_core.documents import Document
+from langchain_core.prompts import PromptTemplate
 
 from core.ports import DocumentRetriever, ChatModel
 from core.types import QueryStr, QueryList, TranslationContext
+from utilities import fusion
 from routing.HeuristicRouter import HeuristicRouter
-from utilities.fusion import perform_reciprocal_rank_fusion
 
 logger: logging.Logger = logging.getLogger()
 
@@ -32,5 +32,5 @@ class RAGEngine:
         for q in qlist:
             docs.append(self.doc_retriever.retrieve(q, top_k=top_k))
         # Weed out the most relevant documents using Reciprocal Rank Fusion.
-        ranked_docs: List[Document] = perform_reciprocal_rank_fusion(docs)
+        ranked_docs: List[Document] = fusion.perform_rrf(docs)
         return self.chat_model.generate(self.sys_prompt_template, query, ranked_docs)

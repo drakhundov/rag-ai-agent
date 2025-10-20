@@ -8,8 +8,7 @@ import anyio
 from app_composition import build_rag_engine, setup_langsmith
 from core.config import load_conf
 from services.RAGEngine import RAGEngine
-from utilities.string import format_response
-from utilities.cli import parse_args
+from utilities import string, cli
 
 setup_langsmith()
 
@@ -55,7 +54,7 @@ def run_terminal_mode(rag_svc: RAGEngine):
             if not user_input:
                 continue
             response = rag_svc.generate_answer(user_input)
-            print(f"\033[96m{format_response(response)}\033[0m")
+            print(f"\033[96m{string.format_response(response)}\033[0m")
     except KeyboardInterrupt:
         print("\nExiting...")
 
@@ -64,7 +63,7 @@ def main():
     global rag_svc
     if rag_svc is None:
         raise RuntimeError("RAG Engine has not been initialized.")
-    args = parse_args()
+    args = cli.parse_args()
     if args.cl:
         run_web_mode(rag_svc)
     else:

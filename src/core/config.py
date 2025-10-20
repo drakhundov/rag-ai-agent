@@ -10,7 +10,7 @@ from typing import List
 import dotenv
 from pydantic import SecretStr
 
-from utilities.string import replace_placeholders
+from utilities import string
 
 
 @dataclass(frozen=True)
@@ -93,7 +93,7 @@ def load_conf() -> _Config:
     resolved = dict(settings)
     for k, v in resolved.items():
         if isinstance(v, str):
-            resolved[k] = replace_placeholders(v, resolved)
+            resolved[k] = string.replace_placeholders(v, resolved)
     paths = _Paths(
         proj_dir=proj_dir,
         cache_dir=Path(resolved["CACHE_DIR"]).resolve(),

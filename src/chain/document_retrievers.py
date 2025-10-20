@@ -2,10 +2,10 @@ import logging
 import os
 from typing import List
 
-from langchain_huggingface import HuggingFaceEndpointEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
+from langchain_huggingface import HuggingFaceEndpointEmbeddings
 
 from core.config import load_conf
 from core.ports import TextSplitter

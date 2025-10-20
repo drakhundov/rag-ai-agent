@@ -1,5 +1,5 @@
-from typing import Dict, Optional
 import logging
+from typing import Dict, Optional
 
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate

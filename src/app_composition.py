@@ -8,7 +8,7 @@ from langchain_core.prompts import PromptTemplate
 from chain import OpenAIChatModel, ChromaDocumentRetriever, SemanticTextSplitter
 from core.config import load_conf
 from services.RAGEngine import RAGEngine
-from utilities.cli import with_temp_message
+from utilities import cli
 
 logger: logging.Logger = logging.getLogger()
 
@@ -25,7 +25,7 @@ def setup_langsmith():
         os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
-@with_temp_message("Building RAG Engine...")
+@cli.with_temp_message("Building RAG Engine...")
 def build_rag_engine(filepaths: List[str]) -> RAGEngine:
     docs = []
     for fpath in filepaths:

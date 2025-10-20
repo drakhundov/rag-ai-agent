@@ -1,6 +1,6 @@
 from langchain_core.documents import Document
 
-from utilities.fusion import perform_reciprocal_rank_fusion
+from utilities import fusion
 
 
 def create_dummy__doc(id: str = None, content: str = "") -> Document:
@@ -31,7 +31,7 @@ def test_basic_fusion_order():
         create_dummy__doc("doc4"),
     ]
 
-    fused = perform_reciprocal_rank_fusion([ranking_a, ranking_b], k_rrf=1)
+    fused = fusion.perform_rrf([ranking_a, ranking_b], k_rrf=1)
     ids = [extract_doc_id(d) for d in fused]
 
     # Expected order.
