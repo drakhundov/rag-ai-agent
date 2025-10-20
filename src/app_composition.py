@@ -1,6 +1,7 @@
 import logging
 import os
 from typing import List
+from datetime import datetime
 
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_core.prompts import PromptTemplate
@@ -8,7 +9,9 @@ from langchain_core.prompts import PromptTemplate
 from chain import OpenAIChatModel, ChromaDocumentRetriever, SemanticTextSplitter
 from core.config import load_conf
 from services.RAGEngine import RAGEngine
+from test_config import with_temp_conf
 from utilities import cli
+from utilities.cli import with_temp_message
 
 logger: logging.Logger = logging.getLogger()
 
@@ -23,6 +26,30 @@ def setup_langsmith():
         os.environ["LANGCHAIN_PROJECT"] = "RAG"
         os.environ["LANGSMITH_ENDPOINT"] = conf.paths.langsmith_api_url
         os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
+
+@cli.with_temp_message("Initializing logs...")
+def init_logs(log_dir: str) -> logging.Logger:
+    with load_conf() as conf:
+        proj_dir = str(conf.paths.proj_dir)
+    full_log_dir = os.path.join(proj_dir, log_dir)
+    os.makedirs(full_log_dir, exist_ok=True)
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        handlers=[
+            logging.FileHandler(
+                os.path.join(
+                    full_log_dir, datetime.strftime(datetime.now(), "%Y%m%d_%H%M%S.log")
+                ),
+                mode="a",
+                encoding="utf-8",
+            ),
+        ],
+        force=True,
+    )
+    return logging.getLogger()
 
 
 @cli.with_temp_message("Building RAG Engine...")
