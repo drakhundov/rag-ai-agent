@@ -1,4 +1,3 @@
-import argparse
 import logging
 import os
 import sys
@@ -10,6 +9,7 @@ from app_composition import build_rag_engine, setup_langsmith
 from core.config import load_conf
 from services.RAGEngine import RAGEngine
 from utilities.string import format_response
+from utilities.cli import parse_args
 
 setup_langsmith()
 
@@ -61,18 +61,10 @@ def run_terminal_mode(rag_svc: RAGEngine):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Run the RAG Assistant in different modes."
-    )
-    parser.add_argument(
-        "--cl", action="store_true", help="Run the assistant in Chainlit web mode."
-    )
-    parser.add_argument(
-        "--shell", action="store_true", help="Run the assistant in shell mode."
-    )
-    flags = [arg for arg in sys.argv[1:] if arg.startswith("-")]
-    args = parser.parse_args(flags)
-
+    global rag_svc
+    if rag_svc is None:
+        raise RuntimeError("RAG Engine has not been initialized.")
+    args = parse_args()
     if args.cl:
         run_web_mode(rag_svc)
     else:
@@ -81,6 +73,7 @@ def main():
 
 
 if __name__ == "__main__":
+    # Initialize logging.
     with load_conf() as conf:
         proj_dir = str(conf.paths.proj_dir)
     log_dir = os.path.join(proj_dir, "logs")
@@ -105,7 +98,7 @@ if __name__ == "__main__":
     logger.debug("Starting RAG Assistant Application")
     # Takes file paths as positional argument.
     files = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
-    print("\rProcessing...")
+    print("\rBuilding RAG Engine...")
     rag_svc = build_rag_engine(files)
     print("\r\033[K")  # Clear the message and return cursor to the beginning.
     main()
