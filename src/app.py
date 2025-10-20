@@ -98,7 +98,5 @@ if __name__ == "__main__":
     logger.debug("Starting RAG Assistant Application")
     # Takes file paths as positional argument.
     files = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
-    print("\rBuilding RAG Engine...")
     rag_svc = build_rag_engine(files)
-    print("\r\033[K")  # Clear the message and return cursor to the beginning.
     main()

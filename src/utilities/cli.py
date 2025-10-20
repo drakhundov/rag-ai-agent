@@ -19,3 +19,15 @@ def parse_args(sys_args: List[str] = None) -> argparse.Namespace:
     )
     flags = [arg for arg in sys_args if arg.startswith("-")]
     return parser.parse_args(flags)
+
+
+def with_temp_message(func, message: str):
+    """Decorator to show a temporary message while executing a function."""
+
+    def wrapper(*args, **kwargs):
+        print(f"\r{message}", end="", flush=True)
+        result = func(*args, **kwargs)
+        print("\r\033[K", end="", flush=True)
+        return result
+
+    return wrapper

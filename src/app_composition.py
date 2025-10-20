@@ -1,15 +1,17 @@
+import logging
 import os
 from typing import List
-import logging
 
-from langchain_core.prompts import PromptTemplate
 from langchain_community.document_loaders import PyPDFLoader
+from langchain_core.prompts import PromptTemplate
 
 from chain import OpenAIChatModel, ChromaDocumentRetriever, SemanticTextSplitter
 from core.config import load_conf
 from services.RAGEngine import RAGEngine
+from utilities.cli import with_temp_message
 
 logger: logging.Logger = logging.getLogger()
+
 
 # Ensure imports could omit "src".
 # sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -22,7 +24,8 @@ def setup_langsmith():
         os.environ["LANGSMITH_ENDPOINT"] = conf.paths.langsmith_api_url
         os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-    
+
+@with_temp_message("Building RAG Engine...")
 def build_rag_engine(filepaths: List[str]) -> RAGEngine:
     docs = []
     for fpath in filepaths:
