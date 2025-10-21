@@ -77,6 +77,8 @@ class HeuristicRouter:
         logger.debug(f"Adding translation step: {method.name}")
         if self.qlist is None:
             raise ValueError("`qlist` hasn't been initialized yet.")
+        elif not isinstance(self.qlist, QueryList):
+            raise ValueError("`qlist` must be an instance of QueryList.")
         elif not isinstance(method, TranslationMethod):
             raise ValueError("`method` must be an instance of TranslationMethod Enum.")
         self.qlist.route.append(method)
