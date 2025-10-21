@@ -13,3 +13,4 @@ cache
 chainlit.md
 *.log
 logs/
+routing_sessions/
