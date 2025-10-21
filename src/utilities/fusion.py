@@ -3,9 +3,12 @@ from typing import List, Dict, Optional
 
 from langchain_core.documents import Document
 
+from utilities import cli
+
 logger: logging.Logger = logging.getLogger()
 
 
+@cli.with_temp_message(message="Performing reciprocal rank fusion...")
 def perform_rrf(docs: List[List[Document]], top_k: Optional[int] = None, k_rrf: int = 60) -> List[
     Document]:
     logger.debug("Performing reciprocal rank fusion")

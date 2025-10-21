@@ -52,7 +52,7 @@ class HeuristicRouter:
         self.chat_model = chat_model
         self.qlist: QueryList = QueryList(
             original_query=self.ctx.query,
-            queries=[self.ctx.query],
+            queries=[],
             translation_router=TranslationRouter.HEURISTIC,
             route=list(),
         )

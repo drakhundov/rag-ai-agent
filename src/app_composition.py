@@ -26,7 +26,7 @@ def setup_langsmith():
         os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
-@cli.with_temp_message("Initializing logs...")
+@cli.with_temp_message(message="Initializing logs...")
 def init_logs() -> logging.Logger:
     with load_conf() as conf:
         logs_dir = conf.paths.logs_dir
@@ -49,7 +49,7 @@ def init_logs() -> logging.Logger:
     return logging.getLogger()
 
 
-@cli.with_temp_message("Building RAG Engine...")
+@cli.with_temp_message(message="Building RAG Engine...")
 def build_rag_engine(filepaths: List[str]) -> RAGEngine:
     docs = []
     for fpath in filepaths:
