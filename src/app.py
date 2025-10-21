@@ -57,7 +57,7 @@ def run_terminal_mode(rag_svc: RAGEngine):
 
 
 if __name__ == "__main__":
-    logger = init_logs(log_dir="logs")
+    logger = init_logs()
     logger.debug("Logging is configured")
     logger.debug("Starting RAG Assistant Application")
     # Takes file paths as positional argument.

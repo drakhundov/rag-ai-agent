@@ -1,6 +1,9 @@
+import os
 import logging
 from typing import List
+from datetime import datetime
 
+from core.config import load_conf
 from chain.query_translators import (
     MultiQueryTranslator,
     HyDETranslator,
@@ -14,11 +17,32 @@ from core.types import (
     TranslationMethod,
     TranslationContext,
     TranslationRouter,
-    HeuristicAnalysisParameters
+    HeuristicAnalysisParameters,
 )
 from routing.HeuristicAnalyzer import HeuristicAnalyzer
 
 logger: logging.Logger = logging.getLogger()
+
+# Ensure the router_sessions directory exists.
+# The program will store query translation results there for analysis.
+with load_conf() as conf:
+    os.makedirs(conf.paths.router_sessions_dir, exist_ok=True)
+
+
+def save_session(session_data: QueryList, session_id: str):
+    with load_conf() as conf:
+        session_file = os.path.join(
+            conf.paths.router_sessions_dir,
+            f"{session_id}"
+        )
+    with open(session_file, "w") as f:
+        f.write(f"Original Query: {session_data.original_query}\n")
+        f.write(f"Translation Router: {session_data.translation_router}\n")
+        f.write(f"Translation Route: {[method.value for method in session_data.route]}\n")
+        f.write("Queries:\n")
+        for i, query in enumerate(session_data.queries):
+            f.write(f"  {i + 1}. {query}\n")
+    logger.debug(f"Session saved to {session_file}")
 
 
 # Interface: ports/TranslationRouter
@@ -95,4 +119,8 @@ class HeuristicRouter:
         ]
         for translator in self.translators:
             self.qlist.extend(translator.translate(self.ctx))
+        save_session(
+            session_data=self.qlist,
+            session_id=f"{datetime.strftime(datetime.now(), "%Y%m%d_%H%M%S")}{self.ctx.query[:10]}",
+        )
         return self.qlist

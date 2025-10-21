@@ -39,6 +39,8 @@ class _Paths:
     proj_dir: Path
     cache_dir: Path
     chroma_index_dir: Path
+    logs_dir: Path
+    router_sessions_dir: Path
     hf_router_url: str
     langsmith_api_url: str
 
@@ -98,6 +100,8 @@ def load_conf() -> _Config:
         proj_dir=proj_dir,
         cache_dir=Path(resolved["CACHE_DIR"]).resolve(),
         chroma_index_dir=Path(resolved["CHROMA_INDEX_DIR"]).resolve(),
+        logs_dir=Path(resolved["LOGS_DIR"]).resolve(),
+        router_sessions_dir=Path(resolved["ROUTER_SESSIONS_DIR"]).resolve(),
         hf_router_url=resolved["HF_ROUTER_URL"],
         langsmith_api_url=resolved["LANGSMITH_API_URL"]
     )

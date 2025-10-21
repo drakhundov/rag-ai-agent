@@ -9,9 +9,7 @@ from langchain_core.prompts import PromptTemplate
 from chain import OpenAIChatModel, ChromaDocumentRetriever, SemanticTextSplitter
 from core.config import load_conf
 from services.RAGEngine import RAGEngine
-from test_config import with_temp_conf
 from utilities import cli
-from utilities.cli import with_temp_message
 
 logger: logging.Logger = logging.getLogger()
 
@@ -29,11 +27,10 @@ def setup_langsmith():
 
 
 @cli.with_temp_message("Initializing logs...")
-def init_logs(log_dir: str) -> logging.Logger:
+def init_logs() -> logging.Logger:
     with load_conf() as conf:
-        proj_dir = str(conf.paths.proj_dir)
-    full_log_dir = os.path.join(proj_dir, log_dir)
-    os.makedirs(full_log_dir, exist_ok=True)
+        logs_dir = conf.paths.logs_dir
+    os.makedirs(logs_dir, exist_ok=True)
     logging.basicConfig(
         level=logging.DEBUG,
         format="%(asctime)s [%(levelname)s] %(message)s",
@@ -41,7 +38,7 @@ def init_logs(log_dir: str) -> logging.Logger:
         handlers=[
             logging.FileHandler(
                 os.path.join(
-                    full_log_dir, datetime.strftime(datetime.now(), "%Y%m%d_%H%M%S.log")
+                    logs_dir, datetime.strftime(datetime.now(), "%Y%m%d_%H%M%S.log")
                 ),
                 mode="a",
                 encoding="utf-8",
