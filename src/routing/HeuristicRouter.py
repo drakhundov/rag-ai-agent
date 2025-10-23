@@ -1,9 +1,8 @@
-import os
 import logging
-from typing import List
+import os
 from datetime import datetime
+from typing import List
 
-from core.config import load_conf
 from chain.query_translators import (
     MultiQueryTranslator,
     HyDETranslator,
@@ -11,38 +10,27 @@ from chain.query_translators import (
     StepBackTranslator,
     DecompositionTranslator,
 )
+from core.config import load_conf
 from core.ports import ChatModel
 from core.types import (
+    QueryStr,
     QueryList,
     TranslationMethod,
     TranslationContext,
     TranslationRouter,
+    TranslationRoute,
     HeuristicAnalysisParameters,
 )
 from routing.HeuristicAnalyzer import HeuristicAnalyzer
+from utilities import fs
 
 logger: logging.Logger = logging.getLogger()
 
 # Ensure the router_sessions directory exists.
 # The program will store query translation results there for analysis.
 with load_conf() as conf:
-    os.makedirs(conf.paths.router_sessions_dir, exist_ok=True)
-
-
-def save_session(session_data: QueryList, session_id: str):
-    with load_conf() as conf:
-        session_file = os.path.join(
-            conf.paths.router_sessions_dir,
-            f"{session_id}"
-        )
-    with open(session_file, "w") as f:
-        f.write(f"Original Query: {session_data.original_query}\n")
-        f.write(f"Translation Router: {session_data.translation_router}\n")
-        f.write(f"Translation Route: {[method.value for method in session_data.route]}\n")
-        f.write("Queries:\n")
-        for i, query in enumerate(session_data.queries):
-            f.write(f"  {i + 1}. {query}\n")
-    logger.debug(f"Session saved to {session_file}")
+    SESSIONS_DIR = str(conf.paths.router_sessions_dir)
+    os.makedirs(SESSIONS_DIR, exist_ok=True)
 
 
 # Interface: ports/TranslationRouter
@@ -54,7 +42,7 @@ class HeuristicRouter:
             original_query=self.ctx.query,
             queries=[],
             translation_router=TranslationRouter.HEURISTIC,
-            route=list(),
+            route=TranslationRoute([]),
         )
         self.route_constructed: bool = False
         self.add_translation_step(TranslationMethod.IDENTITY)
@@ -75,8 +63,7 @@ class HeuristicRouter:
         logger.debug("Routing the query...")
         # Figure out the pipeline.
         q = self.ctx.query
-        q_len = len(q.split())
-        text = q.lower()
+        text: QueryStr = QueryStr(q.lower())
         analyzer = HeuristicAnalyzer(
             query=text,
             params=HeuristicAnalysisParameters(
@@ -119,8 +106,9 @@ class HeuristicRouter:
         ]
         for translator in self.translators:
             self.qlist.extend(translator.translate(self.ctx))
-        save_session(
-            session_data=self.qlist,
+        fs.save_session(
+            session_data=self.qlist.to_dict(),
+            path=SESSIONS_DIR,
             session_id=f"{datetime.strftime(datetime.now(), "%Y%m%d_%H%M%S")}{self.ctx.query[:10]}",
         )
         return self.qlist

@@ -41,6 +41,7 @@ class _Paths:
     chroma_index_dir: Path
     logs_dir: Path
     router_sessions_dir: Path
+    chunking_sessions_dir: Path
     hf_router_url: str
     langsmith_api_url: str
 
@@ -102,6 +103,7 @@ def load_conf() -> _Config:
         chroma_index_dir=Path(resolved["CHROMA_INDEX_DIR"]).resolve(),
         logs_dir=Path(resolved["LOGS_DIR"]).resolve(),
         router_sessions_dir=Path(resolved["ROUTER_SESSIONS_DIR"]).resolve(),
+        chunking_sessions_dir=Path(resolved["CHUNKING_SESSIONS_DIR"]).resolve(),
         hf_router_url=resolved["HF_ROUTER_URL"],
         langsmith_api_url=resolved["LANGSMITH_API_URL"]
     )

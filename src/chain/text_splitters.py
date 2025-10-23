@@ -1,13 +1,21 @@
 import logging
+import os
+from datetime import datetime
 from typing import List, Dict
 
 import numpy as np
 from langchain_core.documents import Document
 
 from core.config import load_conf
-from utilities import string, vector
+from utilities import string, vector, fs
 
 logger: logging.Logger = logging.getLogger()
+
+# Ensure the chunking_sessions directory exists.
+# The program will store query translation results there for analysis.
+with load_conf() as conf:
+    SESSIONS_DIR = str(conf.paths.chunking_sessions_dir)
+    os.makedirs(SESSIONS_DIR, exist_ok=True)
 
 
 # Interface: ports/TextSplitter
@@ -19,11 +27,11 @@ class SemanticTextSplitter:
     ):
         logger.debug("Starting SemanticTextSplitter initialization")
 
-        self.conf = load_conf()
-        if bufsz is None:
-            bufsz = self.conf.concat_bufsz
-        if breakpoint_percentile_threshold is None:
-            breakpoint_percentile_threshold = self.conf.breakpoint_percentile_threshold
+        with load_conf() as conf:
+            if bufsz is None:
+                bufsz = conf.concat_bufsz
+            if breakpoint_percentile_threshold is None:
+                breakpoint_percentile_threshold = conf.breakpoint_percentile_threshold
         self.bufsz = bufsz
         self.breakpoint_percentile_threshold = breakpoint_percentile_threshold
 
@@ -73,6 +81,12 @@ class SemanticTextSplitter:
                         metadata=SemanticTextSplitter.inherit_metadata(doc, idx),
                     )
                 )
+
+        fs.save_session(
+            session_data={"chunks": all_chunks},
+            path=SESSIONS_DIR,
+            session_id=f"{datetime.strftime(datetime.now(), "%Y%m%d_%H%M%S")}",
+        )
 
         return all_chunks
 

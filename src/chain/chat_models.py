@@ -17,14 +17,14 @@ logger: logging.Logger = logging.getLogger()
 class OpenAIChatModel(Runnable):
     def __init__(self, model_name: str = None, api_key: SecretStr = None):
         logger.debug("Starting OpenAIChatModel initialization")
-        self.conf = load_conf()
-        if model_name is None:
-            model_name = self.conf.models.chat_model_name
-        if api_key is None:
-            api_key = self.conf.openai_api_key
-        self._llm_model = ChatOpenAI(
-            model=model_name, base_url=self.conf.paths.hf_router_url, api_key=api_key
-        )
+        with load_conf() as conf:
+            if model_name is None:
+                model_name = conf.models.chat_model_name
+            if api_key is None:
+                api_key = conf.openai_api_key
+            self._llm_model = ChatOpenAI(
+                model=model_name, base_url=conf.paths.hf_router_url, api_key=api_key
+            )
         logger.debug("OpenAIChatModel initialized")
 
     def generate(

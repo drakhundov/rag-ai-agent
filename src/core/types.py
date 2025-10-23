@@ -70,6 +70,14 @@ class QueryList:
             raise ValueError("Cannot extend QueryList with a different original_query or translation_router")
         self.queries.extend(querylst.queries)
 
+    def to_dict(self):
+        return {
+            "original_query": self.original_query,
+            "queries": self.queries,
+            "translation_router": self.translation_router,
+            "route": self.route
+        }
+
     def add_step(self, method: TranslationMethod):
         if not method in self.route:
             self.route.append(method)
