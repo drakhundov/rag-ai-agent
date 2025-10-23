@@ -83,7 +83,7 @@ class SemanticTextSplitter:
                 )
 
         fs.save_session(
-            session_data={"chunks": all_chunks},
+            session_data={"chunks": [chunk.page_content for chunk in all_chunks]},
             path=SESSIONS_DIR,
             session_id=f"{datetime.strftime(datetime.now(), "%Y%m%d_%H%M%S")}",
         )

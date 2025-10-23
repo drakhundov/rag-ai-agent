@@ -30,5 +30,15 @@ def with_temp_message(message: str):
             result = func(*args, **kwargs)
             print("\r\033[K", end="", flush=True)
             return result
+
         return wrapper
+
     return decorator
+
+
+class TempMsg:
+    def __enter__(self, msg: str):
+        print(f"\r{msg}", end="", flush=True)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print("\r\033[K", end="", flush=True)
