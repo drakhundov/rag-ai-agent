@@ -4,6 +4,7 @@ from typing import Dict
 
 logger: logging.Logger = logging.getLogger()
 
+
 def save_session(session_data: Dict, path: str, session_id: str, filemode="w"):
     session_file = os.path.join(
         path,

@@ -6,8 +6,9 @@
     "CACHE_DIR": "${PROJ_DIR}/cache",
     "CHROMA_INDEX_DIR": "${CACHE_DIR}/chroma_index",
     "LOGS_DIR": "${PROJ_DIR}/logs",
-    "ROUTER_SESSIONS_DIR": "${PROJ_DIR}/router_sessions",
-    "CHUNKING_SESSIONS_DIR": "${PROJ_DIR}/chunking_sessions",
+    "SESSIONS_DIR": "${PROJ_DIR}/sessions",
+    "ROUTER_SESSIONS_DIR": "${SESSIONS_DIR}/router",
+    "CHUNKING_SESSIONS_DIR": "${SESSIONS_DIR}/chunking",
     "HF_ROUTER_URL": "https://router.huggingface.co/v1",
     "LANGSMITH_API_URL": "https://api.smith.langchain.com",
     "PROMPT_TEMPLATES": {

@@ -4,6 +4,7 @@ import sys
 import anyio
 
 from app_composition import build_rag_engine, setup_langsmith, init_logs
+from core.types import QueryStr
 from services.RAGEngine import RAGEngine
 from utilities import string, cli
 
@@ -40,14 +41,12 @@ def run_web_mode(rag_svc: RAGEngine):
         response = await anyio.to_thread.run_sync(rag_svc.generate_answer, text)
         await cl.Message(response).send()
 
-    return
-
 
 def run_terminal_mode(rag_svc: RAGEngine):
     logger.info("Running terminal mode")
     try:
         while True:
-            user_input = input(">> ")
+            user_input: QueryStr = QueryStr(input(">> "))
             if not user_input:
                 continue
             response = rag_svc.generate_answer(user_input)

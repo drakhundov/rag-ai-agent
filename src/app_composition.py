@@ -29,8 +29,8 @@ def setup_langsmith():
 @cli.with_temp_message(message="Initializing logs...")
 def init_logs() -> logging.Logger:
     with load_conf() as conf:
-        logs_dir = conf.paths.logs_dir
-    os.makedirs(logs_dir, exist_ok=True)
+        LOGS_DIR = conf.paths.logs_dir
+    os.makedirs(LOGS_DIR, exist_ok=True)
     logging.basicConfig(
         level=logging.DEBUG,
         format="%(asctime)s [%(levelname)s] %(message)s",
@@ -38,7 +38,7 @@ def init_logs() -> logging.Logger:
         handlers=[
             logging.FileHandler(
                 os.path.join(
-                    logs_dir, datetime.strftime(datetime.now(), "%Y%m%d_%H%M%S.log")
+                    LOGS_DIR, datetime.strftime(datetime.now(), "%Y%m%d_%H%M%S.log")
                 ),
                 mode="a",
                 encoding="utf-8",
