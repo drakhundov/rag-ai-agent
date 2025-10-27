@@ -83,3 +83,8 @@ class QueryList:
             self.route.append(method)
         else:
             raise ValueError(f"Method {method} already in the route: {self.route}")
+
+
+class CacheAttr(Enum):
+    SPLITTER = "splitter"
+    EMBEDDINGS = "embeddings"
