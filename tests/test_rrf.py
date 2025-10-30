@@ -45,7 +45,7 @@ def test_top_k_truncation():
     ranking_a = [create_dummy__doc("a1"), create_dummy__doc("a2"), create_dummy__doc("a3")]
     ranking_b = [create_dummy__doc("b1"), create_dummy__doc("a1"), create_dummy__doc("b2")]
 
-    fused_top2 = perform_reciprocal_rank_fusion([ranking_a, ranking_b], top_k=2, k_rrf=1)
+    fused_top2 = fusion.perform_rrf([ranking_a, ranking_b], top_k=2, k_rrf=1)
     ids = [extract_doc_id(d) for d in fused_top2]
     assert len(ids) == 2
     assert ids[0] in {"a1", "b1", "a2"}
@@ -59,7 +59,7 @@ def test_top_k_none_returns_all():
     ranking_a = [create_dummy__doc("x1"), create_dummy__doc("x2")]
     ranking_b = [create_dummy__doc("x2"), create_dummy__doc("x3")]
 
-    fused = perform_reciprocal_rank_fusion([ranking_a, ranking_b], top_k=None, k_rrf=1)
+    fused = fusion.perform_rrf([ranking_a, ranking_b], top_k=None, k_rrf=1)
     ids = [extract_doc_id(d) for d in fused]
 
     # Unique docs are x1, x2, x3 => expect all 3 returned.
