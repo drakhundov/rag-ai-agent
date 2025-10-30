@@ -1,13 +1,15 @@
 import logging
 import os
 from datetime import datetime
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 import numpy as np
 from langchain_core.documents import Document
 
 from core.config import load_conf
-from utilities import string, vector, fs
+from core.types import CacheAttr
+from services.CacheManager import CacheManager
+from utilities import string, vector, fs, docutils
 
 logger: logging.Logger = logging.getLogger()
 
@@ -45,6 +47,12 @@ class SemanticTextSplitter:
         logger.debug(f"Splitting {len(docs)} documents")
         all_chunks: List[Document] = []
         for doc in docs:
+            #* Try to retrieve chunks from cache in case was split before.
+            hit, cached_splits = self.retrieve_from_cache(doc)
+            if hit:
+                all_chunks.extend(cached_splits)
+                continue
+
             sentences = string.split_into_sentences(doc.page_content)
             if len(sentences) <= 1:
                 # Nothing to chunk; keep as-is.
@@ -89,6 +97,15 @@ class SemanticTextSplitter:
         )
 
         return all_chunks
+
+    def retrieve_from_cache(self, doc: Document) -> Tuple[bool, List[Document]]:
+        cmng = CacheManager("documents")
+        doc_hash = docutils.compute_doc_hash(doc)
+        try:
+            cached_splits = cmng.get(doc_hash, CacheAttr.SPLITTER, read_as_binary=True)
+            return True, cached_splits
+        except FileNotFoundError:
+            return False, []
 
     @staticmethod
     def inherit_metadata(parent: Document, chunk_index: int) -> Dict:

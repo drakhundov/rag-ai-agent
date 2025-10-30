@@ -32,7 +32,7 @@ class CacheManager:
         self._dir = os.path.join(CACHE_DIR, dir_path)
         os.makedirs(self._dir, exist_ok=True)
 
-    def get(self, cache_id: str, attr: CacheAttr, read_as_binary: bool = False) -> Optional[Union[Text, bytes]]:
+    def get(self, cache_id: str, attr: CacheAttr, read_as_binary: bool = False) -> Optional[Union[Text, Any]]:
         path = self._path(cache_id)
         if not os.path.exists(path):
             raise FileNotFoundError(path)

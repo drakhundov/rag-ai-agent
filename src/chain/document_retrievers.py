@@ -1,5 +1,4 @@
 import logging
-import os
 from typing import List
 
 from langchain_chroma import Chroma
@@ -37,33 +36,28 @@ class ChromaDocumentRetriever:
         self.persist_dir = chroma_index_dir
         self.emb_model = emb_model
         self.text_splitter = text_splitter
-        self.docs = docs
         self.vs = None
-        self._initialize_index()
+        self._initialize_index(docs)
         logger.debug("ChromaDocumentRetriever initialized")
 
-    def _initialize_index(self):
+    def _initialize_index(self, docs: List[Document]):
         """Initialize the vectorstore if hasn't been initialized yet."""
         if self.vs is not None:
             return
-        chunks = self.text_splitter.split(self.docs)
-        if not os.path.exists(self.persist_dir):
-            self.vs = Chroma.from_documents(
-                chunks, self.emb_model, persist_directory=self.persist_dir
-            )
-        else:
-            self.vs = Chroma(
-                persist_directory=self.persist_dir,
-                embedding_function=self.emb_model,
-            )
-        self.add_docs(chunks)
+        logger.debug("Loading index")
+        chunks = self.text_splitter.split(docs)
+        self.vs = Chroma.from_documents(
+            chunks, self.emb_model, persist_directory=self.persist_dir
+        )
 
     def retrieve(self, query: QueryStr, top_k: int = 4) -> List[Document]:
         logger.debug(f"Retrieving {query}")
         return self.vs.as_retriever(search_kwargs={"k": top_k}).invoke(query)
 
-    def add_docs(self, docs: List[Document]):
+    def add_docs(self, docs: List[Document], do_split: bool = False):
         logger.debug(f"Adding {len(docs)} documents to the retriever")
+        if do_split:
+            docs = self.text_splitter.split(docs)
         self.vs.add_documents(docs)
         if callable(getattr(self.vs, "persist", None)):
             self.vs.persist()
