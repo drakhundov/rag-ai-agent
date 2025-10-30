@@ -1,8 +1,9 @@
-import hashlib
 from json import dumps, loads
 from typing import List
 
 from langchain_core.documents import Document
+
+from utilities import hashing
 
 
 def get_unique_union(docs: List[Document]) -> List[Document]:
@@ -16,8 +17,7 @@ def compute_doc_hash(doc: Document):
         "page_content": getattr(doc, "page_content", "") or "",
         "metadata": getattr(doc, "metadata", {}) or {},
     }
-    json_bytes = dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False, default=str).encode("utf-8")
-    return hashlib.sha256(json_bytes).hexdigest()
+    return hashing.compute_hash(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False, default=str)
 
 
 def hash_documents(docs: List[Document]):
