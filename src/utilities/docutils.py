@@ -12,7 +12,7 @@ def get_unique_union(docs: List[Document]) -> List[Document]:
     return [loads(doc) for doc in unique_docs]
 
 
-def compute_doc_hash(doc: Document):
+def compute_doc_hash(doc: Document) -> str:
     payload = {
         "page_content": getattr(doc, "page_content", "") or "",
         "metadata": getattr(doc, "metadata", {}) or {},
@@ -20,5 +20,5 @@ def compute_doc_hash(doc: Document):
     return hashing.compute_hash(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False, default=str)
 
 
-def hash_documents(docs: List[Document]):
+def hash_documents(docs: List[Document]) -> List[str]:
     return [compute_doc_hash(doc) for doc in docs]
