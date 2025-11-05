@@ -13,12 +13,6 @@ from utilities import string, vector, fs, docutils
 
 logger: logging.Logger = logging.getLogger()
 
-# Ensure the chunking_sessions directory exists.
-# The program will store query translation results there for analysis.
-with load_conf() as conf:
-    SESSIONS_DIR = str(conf.paths.chunking_sessions_dir)
-    os.makedirs(SESSIONS_DIR, exist_ok=True)
-
 
 # Interface: ports/TextSplitter
 class SemanticTextSplitter:
