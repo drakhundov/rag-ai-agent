@@ -4,6 +4,7 @@ __pycache__
 .env
 *.pdf
 *.txt
+!requirements.txt
 TODO
 .idea
 .pytest_cache
