@@ -21,7 +21,7 @@ from core.types import (
     TranslationRoute,
     HeuristicAnalysisParameters,
 )
-from routing.HeuristicAnalyzer import HeuristicAnalyzer
+from chain.routing import HeuristicAnalyzer
 from utilities import fs
 
 logger: logging.Logger = logging.getLogger()

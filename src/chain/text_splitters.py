@@ -47,7 +47,7 @@ class SemanticTextSplitter:
         logger.debug(f"Splitting {len(docs)} documents")
         all_chunks: List[Document] = []
         for doc in docs:
-            #* Try to retrieve chunks from cache in case was split before.
+            # * Try to retrieve chunks from cache in case was split before.
             hit, cached_splits = self.retrieve_from_cache(doc)
             if hit:
                 all_chunks.extend(cached_splits)
@@ -82,19 +82,22 @@ class SemanticTextSplitter:
             chunk_texts = SemanticTextSplitter.break_sentences_at_breakpoints(
                 sentences, breakpoints
             )
+            doc_splits: List[Document] = []
             for idx, chunk_text in enumerate(chunk_texts):
-                all_chunks.append(
+                doc_splits.append(
                     Document(
                         page_content=chunk_text,
                         metadata=SemanticTextSplitter.inherit_metadata(doc, idx),
                     )
                 )
-
-        fs.save_session(
-            session_data={"chunks": [chunk.page_content for chunk in all_chunks]},
-            path=SESSIONS_DIR,
-            session_id=f"{datetime.strftime(datetime.now(), "%Y%m%d_%H%M%S")}",
-        )
+            all_chunks.extend(doc_splits)
+            cmng = CacheManager("documents")
+            doc_hash = docutils.compute_doc_hash(doc)
+            cmng.set(
+                cache_id=doc_hash,
+                data={CacheAttr.SPLITTER: doc_splits},
+                write_as_binary=True
+            )
 
         return all_chunks
 
@@ -102,7 +105,11 @@ class SemanticTextSplitter:
         cmng = CacheManager("documents")
         doc_hash = docutils.compute_doc_hash(doc)
         try:
-            cached_splits = cmng.get(doc_hash, CacheAttr.SPLITTER, read_as_binary=True)
+            cached_splits = cmng.get(
+                cache_id=doc_hash,
+                attr=CacheAttr.SPLITTER,
+                read_as_binary=True
+            )
             return True, cached_splits
         except FileNotFoundError:
             return False, []

@@ -1,7 +1,7 @@
 import pytest
 
-from routing.HeuristicAnalyzer import HeuristicAnalyzer
-from routing.HeuristicRouter import HeuristicRouter
+from chain.routing import HeuristicAnalyzer
+from chain.routing.HeuristicRouter import HeuristicRouter
 
 
 class DummyParams:

@@ -7,7 +7,7 @@ from langchain_core.prompts import PromptTemplate
 from core.ports import DocumentRetriever, ChatModel
 from core.types import QueryStr, QueryList, TranslationContext
 from utilities import fusion
-from routing.HeuristicRouter import HeuristicRouter
+from chain.routing import HeuristicRouter
 
 logger: logging.Logger = logging.getLogger()
 
