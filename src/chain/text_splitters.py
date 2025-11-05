@@ -45,8 +45,9 @@ class SemanticTextSplitter:
             hit, cached_splits = self.retrieve_from_cache(doc)
             if hit:
                 all_chunks.extend(cached_splits)
+                logger.debug("Hit: %s", doc.page_content[:40])
                 continue
-
+            logger.debug("No hit, splitting the doc: %s", doc.page_content[:40])
             sentences = string.split_into_sentences(doc.page_content)
             if len(sentences) <= 1:
                 # Nothing to chunk; keep as-is.

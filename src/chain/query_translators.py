@@ -42,13 +42,37 @@ class _QueryTranslatorImpl:
                 seen.add(s_norm)
                 queries.append(s_norm)
         return QueryList(
-            original_query=ctx_dict["query"],
+            original_query=ctx_dict.get("query"),
             queries=queries,
             translation_router=ctx_dict.get("translation_router", None),
         )
 
 
-class MultiQueryTranslator:
+class BaseTranslator:
+    def __init__(self, chat_model: ChatModel, prompt_templ: PromptTemplate):
+        self.chat_model = chat_model
+        self.prompt_templ = prompt_templ
+        self._impl: Optional[_QueryTranslatorImpl] = None
+
+    def initialize_impl(self):
+        if self._impl is not None:
+            return
+        self._impl = _QueryTranslatorImpl(
+            chat_model=self.chat_model, prompt_templ=self.prompt_templ
+        )
+
+    def translate(
+        self,
+        ctx: TranslationContext,
+        router: TranslationRouter = TranslationRouter.HEURISTIC,
+    ) -> QueryList:
+        self.initialize_impl()
+        ctx_dict = ctx.to_dict()
+        ctx_dict["translation_router"] = router
+        return self._impl.run(ctx_dict)
+
+
+class MultiQueryTranslator(BaseTranslator):
     def __init__(self, chat_model: ChatModel):
         logger.debug("Starting MultiQueryTranslator initialization")
         with load_conf() as conf:
@@ -56,21 +80,10 @@ class MultiQueryTranslator:
                 input_variables=conf.prompt_templs.multi_query_rag_prompt.input_variables,
                 template=conf.prompt_templs.multi_query_rag_prompt.template,
             )
-        self._impl = _QueryTranslatorImpl(
-            chat_model=chat_model, prompt_templ=prompt_templ
-        )
-
-    def translate(
-        self,
-        ctx: TranslationContext,
-        router: TranslationRouter = TranslationRouter.HEURISTIC,
-    ) -> QueryList:
-        ctx_dict = ctx.to_dict()
-        ctx_dict["translation_router"] = router
-        return self._impl.run(ctx_dict)
+        super().__init__(chat_model, prompt_templ)
 
 
-class HyDETranslator:
+class HyDETranslator(BaseTranslator):
     def __init__(self, chat_model: ChatModel):
         logger.debug("Starting HyDETranslator initialization")
         with load_conf() as conf:
@@ -78,21 +91,10 @@ class HyDETranslator:
                 input_variables=conf.prompt_templs.hyde_rag_prompt.input_variables,
                 template=conf.prompt_templs.hyde_rag_prompt.template,
             )
-        self._impl = _QueryTranslatorImpl(
-            chat_model=chat_model, prompt_templ=prompt_templ
-        )
-
-    def translate(
-        self,
-        ctx: TranslationContext,
-        router: TranslationRouter = TranslationRouter.HEURISTIC,
-    ) -> QueryList:
-        ctx_dict = ctx.to_dict()
-        ctx_dict["translation_router"] = router
-        return self._impl.run(ctx_dict)
+        super().__init__(chat_model, prompt_templ)
 
 
-class DecompositionTranslator:
+class DecompositionTranslator(BaseTranslator):
     def __init__(self, chat_model: ChatModel):
         logger.debug("Starting DecompositionTranslator initialization")
         with load_conf() as conf:
@@ -100,21 +102,10 @@ class DecompositionTranslator:
                 input_variables=conf.prompt_templs.decomposition_rag_prompt.input_variables,
                 template=conf.prompt_templs.decomposition_rag_prompt.template,
             )
-        self._impl = _QueryTranslatorImpl(
-            chat_model=chat_model, prompt_templ=prompt_templ
-        )
-
-    def translate(
-        self,
-        ctx: TranslationContext,
-        router: TranslationRouter = TranslationRouter.HEURISTIC,
-    ) -> QueryList:
-        ctx_dict = ctx.to_dict()
-        ctx_dict["translation_router"] = router
-        return self._impl.run(ctx_dict)
+        super().__init__(chat_model, prompt_templ)
 
 
-class StepBackTranslator:
+class StepBackTranslator(BaseTranslator):
     def __init__(self, chat_model: ChatModel):
         logger.debug("Starting StepBackTranslator initialization")
         with load_conf() as conf:
@@ -122,21 +113,10 @@ class StepBackTranslator:
                 input_variables=conf.prompt_templs.step_back_rag_prompt.input_variables,
                 template=conf.prompt_templs.step_back_rag_prompt.template,
             )
-        self._impl = _QueryTranslatorImpl(
-            chat_model=chat_model, prompt_templ=prompt_templ
-        )
-
-    def translate(
-        self,
-        ctx: TranslationContext,
-        router: TranslationRouter = TranslationRouter.HEURISTIC,
-    ) -> QueryList:
-        ctx_dict = ctx.to_dict()
-        ctx_dict["translation_router"] = router
-        return self._impl.run(ctx_dict)
+        super().__init__(chat_model, prompt_templ)
 
 
-class IdentityTranslator:
+class IdentityTranslator(BaseTranslator):
     def __init__(self, chat_model: Optional[ChatModel] = None):
         logger.debug("Starting IdentityTranslator initialization")
         # Identity translator doesn't need a chat model.
