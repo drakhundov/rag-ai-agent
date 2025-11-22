@@ -45,18 +45,20 @@ def embed_texts(texts: List[str], model_name: str = None) -> np.ndarray:
     cmng = CacheManager("texts")
     for i, text in enumerate(texts):
         hashed[i] = hashlib.md5(text.encode()).hexdigest()
-        hit, cached_emb = cmng.get(
-            cache_id=hashed[i],
-            attr=CacheAttr.EMBEDDINGS,
-            read_as_binary=True
-        )
-        if hit:
+        try:
+            hit, cached_emb = cmng.get(
+                cache_id=hashed[i],
+                attr=CacheAttr.EMBEDDINGS,
+                read_as_binary=True
+            )
             cache_hit_idx.add(i)
             if isinstance(cached_emb, (bytes, bytearray)):
                 arr = np.frombuffer(cached_emb, dtype=np.float32).copy()
             else:
                 arr = np.array(cached_emb, dtype=np.float32)
             embs[i] = arr
+        except FileNotFoundError:
+            continue
     # If all texts have been retrieved from cache, return cached data.
     if len(cache_hit_idx) == len(texts):
         return np.vstack(embs).astype(np.float32)

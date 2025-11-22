@@ -1,7 +1,7 @@
-import logging
 import os
-from datetime import datetime
+import logging
 from typing import List, Dict, Tuple
+from datetime import datetime
 
 import numpy as np
 from langchain_core.documents import Document
@@ -9,10 +9,16 @@ from langchain_core.documents import Document
 from core.config import load_conf
 from core.types import CacheAttr
 from services.CacheManager import CacheManager
-from utilities import string, vector, fs, docutils
+from utilities import string, vector, docutils, fs
 
 logger: logging.Logger = logging.getLogger()
 
+with load_conf() as conf:
+    SESSIONS_DIR = conf.paths.splitter_sessions_dir
+    os.makedirs(SESSIONS_DIR, exist_ok=True)
+
+
+# ! BUG: Caching does not account for configuration.
 
 # Interface: ports/TextSplitter
 class SemanticTextSplitter:
@@ -42,8 +48,9 @@ class SemanticTextSplitter:
         all_chunks: List[Document] = []
         for doc in docs:
             # * Try to retrieve chunks from cache in case was split before.
-            hit, cached_splits = self.retrieve_from_cache(doc)
+            hit, cached_data = self.retrieve_from_cache(doc, self.get_conf())
             if hit:
+                cached_splits = cached_data["splits"]
                 all_chunks.extend(cached_splits)
                 logger.debug("Hit: %s", doc.page_content[:40])
                 continue
@@ -88,15 +95,24 @@ class SemanticTextSplitter:
             all_chunks.extend(doc_splits)
             cmng = CacheManager("documents")
             doc_hash = docutils.compute_doc_hash(doc)
+            payload = {
+                "conf": self.get_conf(),
+                "doc": doc_splits
+            }
             cmng.set(
                 cache_id=doc_hash,
-                data={CacheAttr.SPLITTER: doc_splits},
+                data={CacheAttr.SPLITTER: payload},
                 write_as_binary=True
+            )
+            fs.save_session(
+                session_data={"splits": all_chunks},
+                path=SESSIONS_DIR,
+                session_id=f"{datetime.strftime(datetime.now(), "%Y%m%d_%H%M%S")}"
             )
 
         return all_chunks
 
-    def retrieve_from_cache(self, doc: Document) -> Tuple[bool, List[Document]]:
+    def retrieve_from_cache(self, doc: Document, conf: Dict) -> Tuple[bool, List[Document]]:
         cmng = CacheManager("documents")
         doc_hash = docutils.compute_doc_hash(doc)
         try:
@@ -105,9 +121,18 @@ class SemanticTextSplitter:
                 attr=CacheAttr.SPLITTER,
                 read_as_binary=True
             )
+            for k, v in conf.items():
+                if cached_splits.get(k) != v:
+                    return False, []
             return True, cached_splits
         except FileNotFoundError:
             return False, []
+
+    def get_conf(self):
+        return {
+            "buffer size": self.bufsz,
+            "breakpoint_percentile_threshold": self.breakpoint_percentile_threshold
+        }
 
     @staticmethod
     def inherit_metadata(parent: Document, chunk_index: int) -> Dict:

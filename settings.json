@@ -8,6 +8,7 @@
     "LOGS_DIR": "${PROJ_DIR}/logs",
     "SESSIONS_DIR": "${PROJ_DIR}/sessions",
     "ROUTER_SESSIONS_DIR": "${SESSIONS_DIR}/router",
+    "SPLITTER_SESSIONS_DIR": "${SESSIONS_DIR}/splitter",
     "HF_ROUTER_URL": "https://router.huggingface.co/v1",
     "LANGSMITH_API_URL": "https://api.smith.langchain.com",
     "PROMPT_TEMPLATES": {
