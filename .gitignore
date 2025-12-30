@@ -14,5 +14,5 @@ cache
 chainlit.md
 *.log
 logs/
-router_sessions/
-chunking_sessions/
+sessions/
+*.ipynb
