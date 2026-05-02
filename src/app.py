@@ -59,12 +59,10 @@ if __name__ == "__main__":
     logger = init_logs()
     logger.debug("Logging is configured")
     logger.debug("Starting RAG Assistant Application")
-    # Takes file paths as positional argument.
-    files = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
-    rag_svc = build_rag_engine(files)
+    args = cli.parse_args()
+    rag_svc = build_rag_engine(args.files)
     if rag_svc is None:
         raise RuntimeError("RAG Engine has not been initialized.")
-    args = cli.parse_args()
     if args.cl:
         run_web_mode(rag_svc)
     else:

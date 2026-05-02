@@ -1,15 +1,18 @@
 import argparse
 import sys
-from functools import lru_cache
-from typing import List
+from typing import Sequence
 
 
-@lru_cache(maxsize=1)
-def parse_args(sys_args: List[str] = None) -> argparse.Namespace:
+def parse_args(sys_args: Sequence[str] | None = None) -> argparse.Namespace:
     if sys_args is None:
         sys_args = sys.argv[1:]
     parser = argparse.ArgumentParser(
         description="Run the RAG Assistant in different modes."
+    )
+    parser.add_argument(
+        "files",
+        nargs="*",
+        help="PDF or text files to ingest before starting the assistant.",
     )
     parser.add_argument(
         "--cl", action="store_true", help="Run the assistant in Chainlit web mode."
@@ -17,8 +20,7 @@ def parse_args(sys_args: List[str] = None) -> argparse.Namespace:
     parser.add_argument(
         "--shell", action="store_true", help="Run the assistant in shell mode."
     )
-    flags = [arg for arg in sys_args if arg.startswith("-")]
-    return parser.parse_args(flags)
+    return parser.parse_args(list(sys_args))
 
 
 def with_temp_message(message: str):
