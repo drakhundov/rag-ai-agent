@@ -1,8 +1,49 @@
 import re
+import unicodedata
 from typing import Dict, List
 
 _PLACEHOLDER_RE = re.compile(r"\$\{(\w+)\}")
 _SPLIT_SENTENCES_RE = re.compile(r"(?<=[.!?])\s+")
+
+
+def normalize_input(text: str) -> str:
+    """
+    Standardizes and normalizes input text before processing.
+
+    Applies the following transformations:
+    1. Strip leading/trailing whitespace
+    2. Normalize unicode characters (NFD normalization)
+    3. Remove diacritics (accents)
+    4. Convert to lowercase
+    5. Collapse multiple spaces into single spaces
+    6. Remove extra punctuation marks (but keep essential ones like ? . ! ,)
+
+    Args:
+        text (str): The input text to normalize.
+
+    Returns:
+        str: The normalized text.
+    """
+    if not text:
+        return ""
+    
+    # Strip leading/trailing whitespace
+    text = text.strip()
+    
+    # Normalize unicode and remove diacritics
+    text = unicodedata.normalize("NFD", text)
+    text = "".join(c for c in text if unicodedata.category(c) != "Mn")
+    
+    # Convert to lowercase
+    text = text.lower()
+    
+    # Collapse multiple spaces into single space
+    text = re.sub(r"\s+", " ", text)
+    
+    # Remove excessive punctuation (keep only ?, ., !, ,)
+    text = re.sub(r"[^\w\s?.,!]", "", text)
+    
+    return text
 
 
 def replace_placeholders(string: str, mapping: Dict[str, str]) -> str:

@@ -23,6 +23,7 @@ from core.types import (
 )
 from chain.routing import HeuristicAnalyzer
 from utilities import fs
+from utilities.string import normalize_input
 
 logger: logging.Logger = logging.getLogger()
 
@@ -63,7 +64,7 @@ class HeuristicRouter:
         logger.debug("Routing the query...")
         # Figure out the pipeline.
         q = self.ctx.query
-        text: QueryStr = QueryStr(q.lower())
+        text: QueryStr = QueryStr(normalize_input(q))
         analyzer = HeuristicAnalyzer(
             query=text,
             params=HeuristicAnalysisParameters(
