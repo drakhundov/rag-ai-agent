@@ -41,8 +41,12 @@ def _load_documents_from_file(fpath: str) -> List[Document]:
     )
 
 
-def setup_langsmith():
+def setup_langsmith(must: bool = False):
     with load_conf() as conf:
+        if conf.langchain_api_key is None and not must:
+            return
+        elif must:
+            raise ValueError("Must set up langchain API key")
         os.environ["LANGCHAIN_TRACING_V2"] = "true"
         os.environ["LANGCHAIN_API_KEY"] = conf.langchain_api_key.get_secret_value()
         os.environ["LANGCHAIN_PROJECT"] = "RAG"
