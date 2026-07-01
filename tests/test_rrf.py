@@ -1,6 +1,6 @@
 from langchain_core.documents import Document
 
-from utilities import fusion
+from ragsuite.utilities import fusion
 
 
 def create_dummy__doc(id: str = None, content: str = "") -> Document:

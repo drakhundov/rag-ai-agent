@@ -2,9 +2,9 @@ import pickle
 
 import pytest
 
-import services.CacheManager as cm_module
-from core.types import CacheAttr
-from services.CacheManager import CacheManager
+import ragsuite.services.CacheManager as cm_module
+from ragsuite.core.types import CacheAttr
+from ragsuite.services.CacheManager import CacheManager
 
 
 @pytest.fixture

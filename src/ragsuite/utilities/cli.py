@@ -1,6 +1,6 @@
 import argparse
 import sys
-from typing import Sequence
+from typing import Sequence, Callable
 from functools import lru_cache
 
 
@@ -25,10 +25,10 @@ def parse_args(sys_args: Sequence[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(list(sys_args))
 
 
-def with_temp_message(message: str):
+def with_temp_message(message: str) -> Callable:
     """Decorator to show a temporary message while executing a function."""
 
-    def decorator(func):
+    def decorator(func: Callable) -> Callable:
         def wrapper(*args, **kwargs):
             print(f"\r{message}", end="", flush=True)
             result = func(*args, **kwargs)

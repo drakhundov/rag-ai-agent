@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 # ! Use 'PYTHONPATH=src pytest'
-from core.config import load_conf
+from ragsuite.core.config import load_conf
 
 PROJ_DIR = os.path.dirname(os.path.dirname(__file__))
 
