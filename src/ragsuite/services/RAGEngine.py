@@ -1,13 +1,13 @@
 import logging
 from typing import List
 
+from chain.routing import HeuristicRouter
 from langchain_core.documents import Document
 from langchain_core.prompts import PromptTemplate
 
 from ragsuite.core.ports import DocumentRetriever, ChatModel
 from ragsuite.core.types import QueryStr, QueryList, TranslationContext
 from ragsuite.utilities import fusion
-from chain.routing import HeuristicRouter
 
 logger: logging.Logger = logging.getLogger(__name__)
 

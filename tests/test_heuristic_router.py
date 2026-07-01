@@ -1,7 +1,7 @@
 import pytest
-
 from chain.routing import HeuristicAnalyzer
-from chain.routing.HeuristicRouter import HeuristicRouter
+
+from ragsuite.chain.routing.HeuristicRouter import HeuristicRouter
 
 
 class DummyParams:

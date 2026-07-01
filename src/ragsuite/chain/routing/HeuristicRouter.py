@@ -3,6 +3,8 @@ import os
 from datetime import datetime
 from typing import List
 
+from chain.routing import HeuristicAnalyzer
+
 from ragsuite.chain.query_translators import (
     MultiQueryTranslator,
     HyDETranslator,
@@ -21,7 +23,6 @@ from ragsuite.core.types import (
     TranslationRoute,
     HeuristicAnalysisParameters,
 )
-from chain.routing import HeuristicAnalyzer
 from ragsuite.utilities import fs
 from ragsuite.utilities.string import normalize_input
 

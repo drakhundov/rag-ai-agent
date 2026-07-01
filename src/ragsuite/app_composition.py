@@ -1,8 +1,8 @@
 import logging
 import os
+from datetime import datetime
 from pathlib import Path
 from typing import List
-from datetime import datetime
 
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_core.documents import Document

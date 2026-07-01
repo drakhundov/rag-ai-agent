@@ -1,13 +1,13 @@
-import os
 import logging
+import os
 import subprocess
 
 from ragsuite.app_composition import build_rag_engine, setup_langsmith, init_logs
+from ragsuite.core.config import load_conf
 from ragsuite.core.types import QueryStr
 from ragsuite.services.RAGEngine import RAGEngine
 from ragsuite.utilities import cli
 from ragsuite.utilities import string
-from ragsuite.core.config import load_conf
 
 setup_langsmith()
 

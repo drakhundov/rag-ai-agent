@@ -1,5 +1,6 @@
-import os
 import logging
+import os
+
 import anyio
 
 from ragsuite.app_composition import build_rag_engine
