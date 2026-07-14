@@ -7,7 +7,7 @@ import pytest
 from ragsuite.core.config import load_conf
 
 PROJ_DIR = os.path.dirname(os.path.dirname(__file__))
-
+os.environ["PROJ_DIR"] = PROJ_DIR
 
 @pytest.fixture
 def with_temp_conf(tmp_path, monkeypatch):
@@ -21,21 +21,30 @@ def with_temp_conf(tmp_path, monkeypatch):
 
 
 def test_config_load(with_temp_conf):
+    load_conf.cache_clear()
     os.environ["PROJ_DIR"] = str(with_temp_conf)
     conf = load_conf()
 
-    assert str(conf.paths.proj_dir) == PROJ_DIR
+    assert str(conf.paths.proj_dir) == str(with_temp_conf)
     assert isinstance(conf.paths.chroma_index_dir, Path)
     assert conf.prompt_templs.system.input_variables is not None
     assert conf.prompt_templs.system.template is not None
-    assert str(conf.paths.chroma_index_dir) == os.path.join(PROJ_DIR, "cache/chroma_index")
+    assert str(conf.paths.chroma_index_dir) == os.path.join(str(with_temp_conf), "cache/chroma_index")
 
 
 def test_path_resolution(with_temp_conf):
+    load_conf.cache_clear()
     os.environ["PROJ_DIR"] = str(with_temp_conf)
     conf = load_conf()
 
     assert conf.paths.cache_dir.is_absolute()
     assert conf.paths.chroma_index_dir.is_absolute()
     assert conf.paths.hf_router_url.startswith("http")
-    assert conf.paths.langsmith_api_url.startswith("http")
+
+
+def test_config_load_no_env(monkeypatch):
+    load_conf.cache_clear()
+    monkeypatch.delenv("PROJ_DIR", raising=False)
+    
+    conf = load_conf()
+    assert str(conf.paths.proj_dir) == PROJ_DIR

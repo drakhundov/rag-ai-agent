@@ -41,17 +41,12 @@ class _Paths:
     chroma_index_dir: Path
     logs_dir: Path
     sessions_dir: Path
-    router_sessions_dir: Path
-    splitter_sessions_dir: Path
     hf_router_url: str
-    langsmith_api_url: str
 
 
 @dataclass(frozen=True)
 class _Config:
-    openai_api_key: SecretStr
     hf_token: SecretStr
-    langchain_api_key: SecretStr
     models: _Models
     paths: _Paths
     prompt_templs: _PromptTempls
@@ -75,20 +70,21 @@ def load_conf() -> _Config:
     if (proj_dir_path := os.getenv("PROJ_DIR")) is not None:
         proj_dir = Path(proj_dir_path).resolve()
     else:
-        # This file's path: PROJ_DIR/src/config.py
-        # Thus, we need the second parent.
+        # This file's path: PROJ_DIR/src/ragsuite/core/config.py
+        # Thus, we need the 4th parent (0-indexed, so parents[3]).
         proj_dir = Path(__file__).resolve().parents[3]
+        print(f"Project directory: {proj_dir}")
     # Load variables from the '.env' file.
-    if not os.path.exists(proj_dir / ".env"):
-        raise FileNotFoundError(f"File `{proj_dir / '.env'}` does not exist.")
+    envfpath = proj_dir / ".env"
+    if not os.path.exists(envfpath):
+        raise FileNotFoundError(f"File `{envfpath}` does not exist.")
     dotenv.load_dotenv(proj_dir / ".env", override=False)
 
     if (hf_token := os.getenv("HF_TOKEN")) is None:
         raise ValueError("You must define an HF_TOKEN in the `.env` file.")
-    if (openai_api_key := os.getenv("OPENAI_API_KEY")) is None:
-        raise ValueError("You must define an OPENAI_API_KEY in the `.env` file.")
-    if (langchain_api_key := os.getenv("LANGCHAIN_API_KEY")) is None:
-        raise ValueError("You must define an LANGCHAIN_API_KEY in the `.env` file.")
+
+    if (hf_router_url := os.getenv("HF_ROUTER_URL")) is None:
+        raise ValueError("You must define an HF_ROUTER_URL in the `.env` file.")
 
     if not os.path.exists(proj_dir / "settings.json"):
         raise FileNotFoundError(f"File `{proj_dir / 'settings.json'}` does not exist.")
@@ -104,14 +100,11 @@ def load_conf() -> _Config:
         chroma_index_dir=Path(resolved["CHROMA_INDEX_DIR"]).resolve(),
         logs_dir=Path(resolved["LOGS_DIR"]).resolve(),
         sessions_dir=Path(resolved["SESSIONS_DIR"]).resolve(),
-        router_sessions_dir=Path(resolved["ROUTER_SESSIONS_DIR"]).resolve(),
-        splitter_sessions_dir=Path(resolved["SPLITTER_SESSIONS_DIR"]).resolve(),
-        hf_router_url=resolved["HF_ROUTER_URL"],
-        langsmith_api_url=resolved["LANGSMITH_API_URL"]
+        hf_router_url=hf_router_url,
     )
     models = _Models(
         chat_model_name=resolved["MODELS"]["DEFAULT_CHAT_MODEL"],
-        emb_model_name=resolved["MODELS"]["DEFAULT_EMB_MODEL"]
+        emb_model_name=resolved["MODELS"]["DEFAULT_EMB_MODEL"],
     )
     prompt_templs = _PromptTempls(
         system=_PromptTempl(
@@ -119,31 +112,39 @@ def load_conf() -> _Config:
             template=resolved["PROMPT_TEMPLATES"]["SYSTEM"]["TEMPLATE"],
         ),
         multi_query_rag_prompt=_PromptTempl(
-            input_variables=resolved["PROMPT_TEMPLATES"]["MULTI_QUERY_RAG_PROMPT"]["INPUT_VARIABLES"],
+            input_variables=resolved["PROMPT_TEMPLATES"]["MULTI_QUERY_RAG_PROMPT"][
+                "INPUT_VARIABLES"
+            ],
             template=resolved["PROMPT_TEMPLATES"]["MULTI_QUERY_RAG_PROMPT"]["TEMPLATE"],
         ),
         hyde_rag_prompt=_PromptTempl(
-            input_variables=resolved["PROMPT_TEMPLATES"]["HYDE_RAG_PROMPT"]["INPUT_VARIABLES"],
+            input_variables=resolved["PROMPT_TEMPLATES"]["HYDE_RAG_PROMPT"][
+                "INPUT_VARIABLES"
+            ],
             template=resolved["PROMPT_TEMPLATES"]["HYDE_RAG_PROMPT"]["TEMPLATE"],
         ),
         decomposition_rag_prompt=_PromptTempl(
-            input_variables=resolved["PROMPT_TEMPLATES"]["DECOMPOSITION_RAG_PROMPT"]["INPUT_VARIABLES"],
-            template=resolved["PROMPT_TEMPLATES"]["DECOMPOSITION_RAG_PROMPT"]["TEMPLATE"],
+            input_variables=resolved["PROMPT_TEMPLATES"]["DECOMPOSITION_RAG_PROMPT"][
+                "INPUT_VARIABLES"
+            ],
+            template=resolved["PROMPT_TEMPLATES"]["DECOMPOSITION_RAG_PROMPT"][
+                "TEMPLATE"
+            ],
         ),
         step_back_rag_prompt=_PromptTempl(
-            input_variables=resolved["PROMPT_TEMPLATES"]["STEP_BACK_RAG_PROMPT"]["INPUT_VARIABLES"],
+            input_variables=resolved["PROMPT_TEMPLATES"]["STEP_BACK_RAG_PROMPT"][
+                "INPUT_VARIABLES"
+            ],
             template=resolved["PROMPT_TEMPLATES"]["STEP_BACK_RAG_PROMPT"]["TEMPLATE"],
-        )
+        ),
     )
     return _Config(
-        openai_api_key=SecretStr(openai_api_key),
         hf_token=SecretStr(hf_token),
-        langchain_api_key=SecretStr(langchain_api_key),
         models=models,
         paths=paths,
         prompt_templs=prompt_templs,
         concat_bufsz=resolved["SENTENCE_CONCAT_BUFSZ"],
-        breakpoint_percentile_threshold=resolved["BREAKPOINT_PERCENTILE_THRESHOLD"]
+        breakpoint_percentile_threshold=resolved["BREAKPOINT_PERCENTILE_THRESHOLD"],
     )
 
 
