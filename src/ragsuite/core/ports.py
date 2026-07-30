@@ -13,25 +13,29 @@ from ragsuite.core.types import (
     ResponseStr,
     QueryList,
     TranslationContext,
-    TranslationRouter,
+    TranslationRoute
 )
 
 
-class ChatModel(Protocol):
+class LLMClient(Protocol):
     def generate(
-        self, prompt_templ: PromptTemplate, query: QueryStr, context: List[Document]
+        self, prompt_templ: PromptTemplate, query: QueryStr, context_docs: List[Document]
     ) -> ResponseStr: ...
 
 
-class DocumentRetriever(Protocol):
-    def retrieve(self, query: QueryStr, top_k: int = 4) -> List[Document]: ...
+class Retriever(Protocol):
+    def retrieve(self, query: QueryStr, top_k: int = 5) -> List[Document]: ...
 
 
-class TextSplitter(Protocol):
+class Splitter(Protocol):
     def split(self, docs: List[Document]) -> List[Document]: ...
 
 
 class QueryTranslator(Protocol):
     def translate(
-        self, ctx: TranslationContext, router: TranslationRouter
+        self, ctx: TranslationContext
     ) -> QueryList: ...
+
+
+class TranslationRouter(Protocol):
+    def route(self, config: TranslationContext) -> TranslationRoute: ...

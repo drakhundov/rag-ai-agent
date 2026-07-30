@@ -1,4 +1,4 @@
-"""This module deals with .env (API TOKENS) and configuration (models, paths)."""
+"""This module deals with .env (API TOKENS) and configuration (prompt templates, paths)."""
 
 import json
 import os
@@ -14,24 +14,18 @@ from ragsuite.utilities import string
 
 
 @dataclass(frozen=True)
-class _PromptTempl:
+class _PromptTemplateConfig:
     input_variables: List[str]
     template: str
 
 
 @dataclass(frozen=True)
-class _PromptTempls:
-    system: _PromptTempl
-    multi_query_rag_prompt: _PromptTempl
-    hyde_rag_prompt: _PromptTempl
-    decomposition_rag_prompt: _PromptTempl
-    step_back_rag_prompt: _PromptTempl
-
-
-@dataclass(frozen=True)
-class _Models:
-    chat_model_name: str
-    emb_model_name: str
+class _PromptTemplateList:
+    system: _PromptTemplateConfig
+    multi_query_rag_prompt: _PromptTemplateConfig
+    hyde_rag_prompt: _PromptTemplateConfig
+    decomposition_rag_prompt: _PromptTemplateConfig
+    step_back_rag_prompt: _PromptTemplateConfig
 
 
 @dataclass(frozen=True)
@@ -41,17 +35,14 @@ class _Paths:
     chroma_index_dir: Path
     logs_dir: Path
     sessions_dir: Path
-    hf_router_url: str
+    router_url: str
 
 
 @dataclass(frozen=True)
 class _Config:
-    hf_token: SecretStr
-    models: _Models
+    llm_api_key: SecretStr
     paths: _Paths
-    prompt_templs: _PromptTempls
-    concat_bufsz: int
-    breakpoint_percentile_threshold: int
+    prompt_templ_lst: _PromptTemplateList
 
     def __enter__(self):
         return self
@@ -80,15 +71,12 @@ def load_conf() -> _Config:
         raise FileNotFoundError(f"File `{envfpath}` does not exist.")
     dotenv.load_dotenv(proj_dir / ".env", override=False)
 
-    if (hf_token := os.getenv("HF_TOKEN")) is None:
-        raise ValueError("You must define an HF_TOKEN in the `.env` file.")
+    if (llm_api_key := os.getenv("LLM_API_KEY")) is None:
+        raise ValueError("You must define an LLM_API_KEY in the `.env` file.")
 
-    if (hf_router_url := os.getenv("HF_ROUTER_URL")) is None:
-        raise ValueError("You must define an HF_ROUTER_URL in the `.env` file.")
-
-    if not os.path.exists(proj_dir / "settings.json"):
-        raise FileNotFoundError(f"File `{proj_dir / 'settings.json'}` does not exist.")
-    with open(proj_dir / "settings.json") as fp:
+    if not os.path.exists(proj_dir / "config.json"):
+        raise FileNotFoundError(f"File `{proj_dir / 'config.json'}` does not exist.")
+    with open(proj_dir / "config.json") as fp:
         settings = {**json.load(fp), **{"PROJ_DIR": proj_dir}}
     resolved = dict(settings)
     for k, v in resolved.items():
@@ -100,30 +88,26 @@ def load_conf() -> _Config:
         chroma_index_dir=Path(resolved["CHROMA_INDEX_DIR"]).resolve(),
         logs_dir=Path(resolved["LOGS_DIR"]).resolve(),
         sessions_dir=Path(resolved["SESSIONS_DIR"]).resolve(),
-        hf_router_url=hf_router_url,
+        router_url=resolved["ROUTER_URL"],
     )
-    models = _Models(
-        chat_model_name=resolved["MODELS"]["DEFAULT_CHAT_MODEL"],
-        emb_model_name=resolved["MODELS"]["DEFAULT_EMB_MODEL"],
-    )
-    prompt_templs = _PromptTempls(
-        system=_PromptTempl(
+    prompt_templ_lst = _PromptTemplateList(
+        system=_PromptTemplateConfig(
             input_variables=resolved["PROMPT_TEMPLATES"]["SYSTEM"]["INPUT_VARIABLES"],
             template=resolved["PROMPT_TEMPLATES"]["SYSTEM"]["TEMPLATE"],
         ),
-        multi_query_rag_prompt=_PromptTempl(
+        multi_query_rag_prompt=_PromptTemplateConfig(
             input_variables=resolved["PROMPT_TEMPLATES"]["MULTI_QUERY_RAG_PROMPT"][
                 "INPUT_VARIABLES"
             ],
             template=resolved["PROMPT_TEMPLATES"]["MULTI_QUERY_RAG_PROMPT"]["TEMPLATE"],
         ),
-        hyde_rag_prompt=_PromptTempl(
+        hyde_rag_prompt=_PromptTemplateConfig(
             input_variables=resolved["PROMPT_TEMPLATES"]["HYDE_RAG_PROMPT"][
                 "INPUT_VARIABLES"
             ],
             template=resolved["PROMPT_TEMPLATES"]["HYDE_RAG_PROMPT"]["TEMPLATE"],
         ),
-        decomposition_rag_prompt=_PromptTempl(
+        decomposition_rag_prompt=_PromptTemplateConfig(
             input_variables=resolved["PROMPT_TEMPLATES"]["DECOMPOSITION_RAG_PROMPT"][
                 "INPUT_VARIABLES"
             ],
@@ -131,7 +115,7 @@ def load_conf() -> _Config:
                 "TEMPLATE"
             ],
         ),
-        step_back_rag_prompt=_PromptTempl(
+        step_back_rag_prompt=_PromptTemplateConfig(
             input_variables=resolved["PROMPT_TEMPLATES"]["STEP_BACK_RAG_PROMPT"][
                 "INPUT_VARIABLES"
             ],
@@ -139,12 +123,9 @@ def load_conf() -> _Config:
         ),
     )
     return _Config(
-        hf_token=SecretStr(hf_token),
-        models=models,
+        llm_api_key=SecretStr(llm_api_key),
         paths=paths,
-        prompt_templs=prompt_templs,
-        concat_bufsz=resolved["SENTENCE_CONCAT_BUFSZ"],
-        breakpoint_percentile_threshold=resolved["BREAKPOINT_PERCENTILE_THRESHOLD"],
+        prompt_templ_lst=prompt_templ_lst
     )
 
 

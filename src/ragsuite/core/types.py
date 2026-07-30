@@ -1,11 +1,16 @@
-from dataclasses import dataclass
+from __future__ import annotations
+
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import NewType, List, Optional, Dict
+
+# * --------------- QUERY ---------------
 
 QueryStr = NewType("QueryStr", str)
 ResponseStr = NewType("ResponseStr", str)
 
 
+# * --------------- TRANSLATION ---------------
 class TranslationMethod(Enum):
     MULTI_QUERY = "multi-query"
     HYDE = "hyde"
@@ -15,10 +20,6 @@ class TranslationMethod(Enum):
 
 
 TranslationRoute = NewType("TranslationRoute", List[TranslationMethod])
-
-
-class TranslationRouter(Enum):
-    HEURISTIC = "heuristic"
 
 
 @dataclass(frozen=True)
@@ -45,10 +46,10 @@ HeuristicAnalysis = NewType("HeuristicAnalysis", Dict[str, bool])
 
 @dataclass
 class QueryList:
+    """Stores the list of queries produced by various query translators along with the original query and the route (translation methods used)."""
     original_query: QueryStr
     queries: List[QueryStr]
-    translation_router: Optional[TranslationRouter] = None
-    route: TranslationRoute = None
+    route: TranslationRoute = field(default_factory=TranslationRoute)
 
     def __iter__(self):
         return iter(self.queries)
@@ -59,22 +60,21 @@ class QueryList:
     def __getitem__(self, index):
         return self.queries[index]
 
-    def __eq__(self, other: 'QueryList'):
+    def __eq__(self, other: QueryList):
         if not isinstance(other, QueryList):
             return False
         return (self.original_query == other.original_query and
-                self.translation_router == other.translation_router)
+                self.route == other.route)
 
-    def extend(self, querylst: 'QueryList'):
-        if self != querylst:
+    def extend(self, other_list: QueryList):
+        if self != other_list:
             raise ValueError("Cannot extend QueryList with a different original_query or translation_router")
-        self.queries.extend(querylst.queries)
+        self.queries.extend(other_list.queries)
 
     def to_dict(self):
         return {
             "original_query": self.original_query,
             "queries": self.queries,
-            "translation_router": self.translation_router,
             "route": self.route
         }
 
@@ -83,6 +83,40 @@ class QueryList:
             self.route.append(method)
         else:
             raise ValueError(f"Method {method} already in the route: {self.route}")
+
+
+# * --------------- FUSION ---------------
+@dataclass(frozen=True)
+class RRFConfig:
+    top_k: int
+    k_rrf: int
+
+    def to_dict(self):
+        return {
+            "top_k": self.top_k,
+            "k_rrf": self.k_rrf
+        }
+
+
+# * --------------- INGESTION ---------------
+@dataclass(frozen=True)
+class SemanticTextSplitterConfig:
+    bufsz: int
+    breakpoint_percentile_threshold: float
+
+    def to_dict(self):
+        return {
+            "buffer size": self.bufsz,
+            "breakpoint_percentile_threshold": self.breakpoint_percentile_threshold,
+        }
+
+
+# * --------------- SERVICES ---------------
+class DocumentFormat(Enum):
+    TXT = ".txt"
+    PDF = ".pdf"
+    MD = ".md"
+    HTML = ".html"
 
 
 class CacheAttr(Enum):
