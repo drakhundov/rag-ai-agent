@@ -8,6 +8,7 @@ Might save time and resources by avoiding redundant computation.
 import json
 import logging
 import os
+import time
 from pathlib import Path
 from typing import Dict, Tuple, Any
 
@@ -28,6 +29,9 @@ class CacheStore:
     !Critical points:
     — collisions
     """
+
+    # Cache expires within Time-To-Live seconds.
+    TTL_SECONDS = 88600
 
     def __init__(self, svc_id: str):
         """Initialized by each service individually."""
@@ -66,6 +70,14 @@ class CacheStore:
 
     def get(self, cache_key: str) -> Tuple[bool, Dict[str, Any] | None]:
         try:
+            filepath = self.local_disk_store.construct_path(cache_key)
+            if os.path.exists(filepath):
+                t = time.time() - os.path.getmtime(filepath)
+                if t > CacheStore.TTL_SECONDS:
+                    logger.debug("Cache cache_key=%s expired. File age: %s", cache_key, t)
+                    os.remove(filepath)
+                    return False, None
+
             loaded_cache = self.local_disk_store.load(cache_key)
             return True, loaded_cache
 

@@ -117,8 +117,3 @@ class DocumentFormat(Enum):
     PDF = ".pdf"
     MD = ".md"
     HTML = ".html"
-
-
-class CacheAttr(Enum):
-    SPLITTER = "splitter"
-    EMBEDDINGS = "embeddings"
