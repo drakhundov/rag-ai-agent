@@ -1,8 +1,13 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import NewType, List, Optional, Dict
+
+from ragsuite.utilities import err
+
+logger: logging.Logger = logging.getLogger(__name__)
 
 # * --------------- QUERY ---------------
 
@@ -68,7 +73,10 @@ class QueryList:
 
     def extend(self, other_list: QueryList):
         if self != other_list:
-            raise ValueError("Cannot extend QueryList with a different original_query or translation_router")
+            err.log_and_raise(
+                logger,
+                ValueError("Cannot extend QueryList with a different original_query or translation_router"),
+            )
         self.queries.extend(other_list.queries)
 
     def to_dict(self):
@@ -82,7 +90,7 @@ class QueryList:
         if not method in self.route:
             self.route.append(method)
         else:
-            raise ValueError(f"Method {method} already in the route: {self.route}")
+            err.log_and_raise(logger, ValueError(f"Method {method} already in the route: {self.route}"))
 
 
 # * --------------- FUSION ---------------
@@ -109,11 +117,3 @@ class SemanticTextSplitterConfig:
             "buffer size": self.bufsz,
             "breakpoint_percentile_threshold": self.breakpoint_percentile_threshold,
         }
-
-
-# * --------------- SERVICES ---------------
-class DocumentFormat(Enum):
-    TXT = ".txt"
-    PDF = ".pdf"
-    MD = ".md"
-    HTML = ".html"

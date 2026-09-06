@@ -35,7 +35,7 @@ class local_mock_conf:
         pass
 
 
-from ragsuite.services.SessionStore import SessionStore
+from ragsuite.store.SessionStore import SessionStore
 
 
 @pytest.fixture(autouse=True)

@@ -9,7 +9,9 @@ from langchain_openai import ChatOpenAI
 from pydantic import SecretStr
 
 from ragsuite.core.config import load_conf
+from ragsuite.store import SessionStore
 from ragsuite.core.types import QueryStr, ResponseStr
+from ragsuite.utilities import err
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -24,6 +26,7 @@ class OpenAIClient(Runnable):
         self._llm_model = ChatOpenAI(
             model=model_name, base_url=conf.paths.router_url, api_key=api_key
         )
+        self.session_store = SessionStore(svc_id="openai-client")
         logger.debug("OpenAIClient initialized")
 
     def generate(
@@ -32,6 +35,7 @@ class OpenAIClient(Runnable):
         logger.debug(f"Generating the answer for query: {query}")
         chain = prompt_templ | self._llm_model
         response = chain.invoke({"query": query, "context": context}).content
+        self.session_store.record({"response": response}, )
         if isinstance(response, str):
             return ResponseStr(response)
         elif isinstance(response, list):
@@ -42,7 +46,7 @@ class OpenAIClient(Runnable):
                 elif isinstance(item, dict):
                     response_lst.append(ResponseStr("\n".join([f"{k}: {v}" for k, v in item.items()])))
             return ResponseStr("\n".join(response_lst))
-        raise TypeError(f"Unexpected response type: {type(response)}")
+        err.log_and_raise(logger, TypeError(f"Unexpected response type: {type(response)}"))
 
     # ! Used to ensure compatibility with LangChain pipelines.
     def invoke(self, _input: LanguageModelInput, *args, **kwargs):

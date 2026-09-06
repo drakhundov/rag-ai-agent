@@ -8,7 +8,7 @@ from langchain_core.documents import Document
 
 from ragsuite.core.config import load_conf
 from ragsuite.core.types import CacheAttr
-from ragsuite.services.CacheManager import CacheManager
+from ragsuite.store import CacheStore
 from ragsuite.utilities import docutils, fs, string
 from ragsuite.utilities import vector
 
@@ -94,7 +94,7 @@ class SemanticTextSplitter:
                     )
                 )
             all_chunks.extend(doc_splits)
-            cmng = CacheManager("documents")
+            cmng = CacheStore("documents")
             doc_hash = docutils.compute_doc_hash(doc)
             payload = {
                 "conf": self.get_conf(),
@@ -114,7 +114,7 @@ class SemanticTextSplitter:
         return all_chunks
 
     def retrieve_from_cache(self, doc: Document, conf: Dict) -> Tuple[bool, List[Document]]:
-        cmng = CacheManager("documents")
+        cmng = CacheStore("documents")
         doc_hash = docutils.compute_doc_hash(doc)
         try:
             cached_splits = cmng.get(

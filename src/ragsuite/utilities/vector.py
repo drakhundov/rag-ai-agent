@@ -6,7 +6,7 @@ from langchain_huggingface import HuggingFaceEndpointEmbeddings
 
 from ragsuite.core.config import load_conf
 from ragsuite.core.types import CacheAttr
-from ragsuite.services.CacheManager import CacheManager
+from ragsuite.store import CacheManager
 
 conf = load_conf()
 

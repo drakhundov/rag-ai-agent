@@ -1,6 +1,7 @@
 """This module deals with .env (API TOKENS) and configuration (prompt templates, paths)."""
 
 import json
+import logging
 import os
 from dataclasses import dataclass
 from functools import lru_cache
@@ -10,7 +11,9 @@ from typing import List
 import dotenv
 from pydantic import SecretStr
 
-from ragsuite.utilities import string
+from ragsuite.utilities import err, string
+
+logger: logging.Logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -68,14 +71,16 @@ def load_conf() -> _Config:
     # Load variables from the '.env' file.
     envfpath = proj_dir / ".env"
     if not os.path.exists(envfpath):
-        raise FileNotFoundError(f"File `{envfpath}` does not exist.")
+        err.log_and_raise(logger, FileNotFoundError(f"File `{envfpath}` does not exist."))
     dotenv.load_dotenv(proj_dir / ".env", override=False)
 
     if (llm_api_key := os.getenv("LLM_API_KEY")) is None:
-        raise ValueError("You must define an LLM_API_KEY in the `.env` file.")
+        err.log_and_raise(logger, ValueError("You must define an LLM_API_KEY in the `.env` file."))
 
     if not os.path.exists(proj_dir / "config.json"):
-        raise FileNotFoundError(f"File `{proj_dir / 'config.json'}` does not exist.")
+        err.log_and_raise(
+            logger, FileNotFoundError(f"File `{proj_dir / 'config.json'}` does not exist.")
+        )
     with open(proj_dir / "config.json") as fp:
         settings = {**json.load(fp), **{"PROJ_DIR": proj_dir}}
     resolved = dict(settings)

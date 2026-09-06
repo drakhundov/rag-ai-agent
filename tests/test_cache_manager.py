@@ -2,9 +2,9 @@ import json
 
 import pytest
 
-import ragsuite.services.CacheManager as cm_module
+import ragsuite.store.CacheStore as cm_module
 from ragsuite.core.types import CacheAttr
-from ragsuite.services.CacheManager import CacheManager
+from ragsuite.store.CacheStore import CacheManager
 
 
 @pytest.fixture
